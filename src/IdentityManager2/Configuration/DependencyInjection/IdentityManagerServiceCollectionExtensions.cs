@@ -48,7 +48,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 return new UrlHelper(actionContext);
             });
             
-            builder.Services.AddAuthorization(options =>
+            builder.Services.AddAuthorizationCore(options =>
             {
                 var policy = options.GetPolicy(IdentityManagerConstants.IdMgrAuthPolicy);
                 if (policy != null) throw new InvalidOperationException($"Authorization policy with name {IdentityManagerConstants.IdMgrAuthPolicy} already exists");
