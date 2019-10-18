@@ -16,7 +16,7 @@ namespace IdentityManager2.Configuration
                 FileProvider = new EmbeddedFileProvider(typeof(Assets.EmbeddedHtmlResult).Assembly, "IdentityManager2.Assets")
             });
 
-            app.UseMvc();
+            //app.UseMvc();
 
             return app;
         }
