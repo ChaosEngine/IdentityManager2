@@ -3,7 +3,7 @@ using IdentityManager2.Resources;
 
 namespace IdentityManager2.Core
 {
-    public class  PropertyValue
+    public class PropertyValue
     {
         [Required(ErrorMessageResourceType = typeof(Messages), ErrorMessageResourceName = "PropertyTypeRequired")]
         public string Type { get; set; }

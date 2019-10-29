@@ -9,228 +9,235 @@ using IdentityManager2.Extensions;
 using IdentityManager2.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using static System.String;
 
 namespace IdentityManager2.Api.Controllers
 {
-    [Route(IdentityManagerConstants.RoleRoutePrefix)]
-    [Authorize(IdentityManagerConstants.IdMgrAuthPolicy)]
-    [ResponseCache(NoStore=true, Location=ResponseCacheLocation.None)]
-    public class RolesController : Controller
-    {
-        private readonly IIdentityManagerService service;
+	[Route(IdentityManagerConstants.RoleRoutePrefix)]
+	[Authorize(IdentityManagerConstants.IdMgrAuthPolicy)]
+	[ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+	public class RolesController : Controller
+	{
+		private readonly IIdentityManagerService service;
+		private readonly LinkGenerator linkGenerator;
 
-        public RolesController(IIdentityManagerService service)
-        {
-            this.service = service ?? throw new ArgumentNullException(nameof(service));
-        }
-        
-        public IActionResult MethodNotAllowed()
-        {
-            return StatusCode(405);
-        }
+		public RolesController(IIdentityManagerService service, LinkGenerator linkGenerator)
+		{
+			this.service = service ?? throw new ArgumentNullException(nameof(service));
+			this.linkGenerator = linkGenerator ?? throw new ArgumentNullException(nameof(linkGenerator));
+		}
 
-        private IdentityManagerMetadata metadata;
+		public IActionResult MethodNotAllowed()
+		{
+			return StatusCode(405);
+		}
 
-        public async Task<IdentityManagerMetadata> GetMetadataAsync()
-        {
-            if (metadata == null)
-            {
-                metadata = await service.GetMetadataAsync();
-                if (metadata == null) throw new InvalidOperationException("GetMetadataAsync returned null");
-                metadata.Validate();
-            }
+		private IdentityManagerMetadata metadata;
 
-            return metadata;
-        }
+		public async Task<IdentityManagerMetadata> GetMetadataAsync()
+		{
+			if (metadata == null)
+			{
+				metadata = await service.GetMetadataAsync();
+				if (metadata == null) throw new InvalidOperationException("GetMetadataAsync returned null");
+				metadata.Validate();
+			}
 
-        // GET api/roles
-        [HttpGet, Route("", Name = IdentityManagerConstants.RouteNames.GetRoles)]
-        public async Task<IActionResult> GetRolesAsync(string filter = null, int start = 0, int count = 100)
-        {
-            var meta = await GetMetadataAsync();
-            if (!meta.RoleMetadata.SupportsListing)
-            {
-                return MethodNotAllowed();
-            }
+			return metadata;
+		}
 
-            var result = await service.QueryRolesAsync(filter, start, count);
-            if (result.IsSuccess)
-            {
-                try
-                {
-                    return Ok(new RoleQueryResultResource(result.Result, Url, meta.RoleMetadata));
-                }
-                catch (Exception exp)
-                {
-                    throw new ArgumentNullException(exp.ToString());
-                }
-            }
+		// GET api/roles
+		[HttpGet, Route("", Name = IdentityManagerConstants.RouteNames.GetRoles)]
+		public async Task<IActionResult> GetRolesAsync(string filter = null, int start = 0, int count = 100)
+		{
+			var meta = await GetMetadataAsync();
+			if (!meta.RoleMetadata.SupportsListing)
+			{
+				return MethodNotAllowed();
+			}
 
-            return BadRequest(result.ToError());
-        }
+			var result = await service.QueryRolesAsync(filter, start, count);
+			if (result.IsSuccess)
+			{
+				try
+				{
+					return Ok(new RoleQueryResultResource(result.Result, linkGenerator, ControllerContext.ActionDescriptor.ControllerName,
+						meta.RoleMetadata));
+				}
+				catch (Exception exp)
+				{
+					throw new ArgumentNullException(exp.ToString());
+				}
+			}
 
-        // POST 
-        [HttpPost, Route("", Name = IdentityManagerConstants.RouteNames.CreateRole)]
-        public async Task<IActionResult> CreateRoleAsync([FromBody]PropertyValue[] properties)
-        {
-            var meta = await GetMetadataAsync();
-            if (!meta.RoleMetadata.SupportsCreate)
-            {
-                return MethodNotAllowed();
-            }
+			return BadRequest(result.ToError());
+		}
 
-            var errors = ValidateCreateProperties(meta.RoleMetadata, properties);
+		// POST 
+		[HttpPost, Route("", Name = IdentityManagerConstants.RouteNames.CreateRole)]
+		public async Task<IActionResult> CreateRoleAsync([FromBody]PropertyValue[] properties)
+		{
+			var meta = await GetMetadataAsync();
+			if (!meta.RoleMetadata.SupportsCreate)
+			{
+				return MethodNotAllowed();
+			}
 
-            foreach (var error in errors)
-            {
-                ModelState.AddModelError("", error);
-            }
+			var errors = ValidateCreateProperties(meta.RoleMetadata, properties);
 
-            if (ModelState.IsValid)
-            {
-                var result = await service.CreateRoleAsync(properties);
-                if (result.IsSuccess)
-                {
-                    var url = Url.Link(IdentityManagerConstants.RouteNames.GetRole, new { subject = result.Result.Subject });
+			foreach (var error in errors)
+			{
+				ModelState.AddModelError("", error);
+			}
 
-                    var resource = new
-                    {
-                        Data = new { subject = result.Result.Subject },
-                        Links = new { detail = url }
-                    };
-                    return Created(url, resource);
-                }
+			if (ModelState.IsValid)
+			{
+				var result = await service.CreateRoleAsync(properties);
+				if (result.IsSuccess)
+				{
+					var url = linkGenerator.GetPathByAction(IdentityManagerConstants.RouteNames.GetRole,
+                        ControllerContext.ActionDescriptor.ControllerName,
+                        new { subject = result.Result.Subject });
 
-                ModelState.AddModelError("", errors.ToString());
-            }
+					var resource = new
+					{
+						Data = new { subject = result.Result.Subject },
+						Links = new { detail = url }
+					};
+					return Created(url, resource);
+				}
 
-            return BadRequest(ModelState.ToError());
-        }
+				ModelState.AddModelError("", errors.ToString());
+			}
 
-        [HttpGet("{subject}", Name = IdentityManagerConstants.RouteNames.GetRole)]
-        public async Task<IActionResult> GetRoleAsync(string subject)
-        {
-            if (IsNullOrWhiteSpace(subject))
-            {
-                ModelState["subject.String"].Errors.Clear();
-                ModelState.AddModelError("", Messages.SubjectRequired);
-            }
+			return BadRequest(ModelState.ToError());
+		}
 
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+		[HttpGet("{subject}", Name = IdentityManagerConstants.RouteNames.GetRole)]
+		public async Task<IActionResult> GetRoleAsync(string subject)
+		{
+			if (IsNullOrWhiteSpace(subject))
+			{
+				ModelState["subject.String"].Errors.Clear();
+				ModelState.AddModelError("", Messages.SubjectRequired);
+			}
 
-            var meta = await GetMetadataAsync();
-            if (!meta.RoleMetadata.SupportsListing)
-            {
-                return MethodNotAllowed();
-            }
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
 
-            var result = await service.GetRoleAsync(subject);
+			var meta = await GetMetadataAsync();
+			if (!meta.RoleMetadata.SupportsListing)
+			{
+				return MethodNotAllowed();
+			}
 
-            if (result.IsSuccess)
-            {
-                if (result.Result == null)
-                {
-                    return NotFound();
-                }
+			var result = await service.GetRoleAsync(subject);
 
-                var response = Ok(new RoleDetailResource(result.Result, Url, meta.RoleMetadata));
+			if (result.IsSuccess)
+			{
+				if (result.Result == null)
+				{
+					return NotFound();
+				}
 
+				var response = Ok(new RoleDetailResource(result.Result, linkGenerator,
+                    ControllerContext.ActionDescriptor.ControllerName,
+                    meta.RoleMetadata));
 
-                return response;
-            }
-            return BadRequest(result.ToError());
-        }
+				return response;
+			}
+			return BadRequest(result.ToError());
+		}
 
-        [HttpDelete, Route("{subject}", Name = IdentityManagerConstants.RouteNames.DeleteRole)]
-        public async Task<IActionResult> DeleteRoleAsync(string subject)
-        {
-            var meta = await GetMetadataAsync();
-            if (!meta.RoleMetadata.SupportsDelete)
-            {
-                return MethodNotAllowed();
-            }
+		[HttpDelete, Route("{subject}", Name = IdentityManagerConstants.RouteNames.DeleteRole)]
+		public async Task<IActionResult> DeleteRoleAsync(string subject)
+		{
+			var meta = await GetMetadataAsync();
+			if (!meta.RoleMetadata.SupportsDelete)
+			{
+				return MethodNotAllowed();
+			}
 
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState.ToError());
-            }
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState.ToError());
+			}
 
-            var result = await service.DeleteRoleAsync(subject);
-            if (result.IsSuccess)
-            {
-                return NoContent();
-            }
+			var result = await service.DeleteRoleAsync(subject);
+			if (result.IsSuccess)
+			{
+				return NoContent();
+			}
 
-            return BadRequest(result.ToError());
-        }
+			return BadRequest(result.ToError());
+		}
 
-        [HttpPut, Route("{subject}/properties/{type}", Name = IdentityManagerConstants.RouteNames.UpdateRoleProperty)]
-        public async Task<IActionResult> SetPropertyAsync(string subject, string type)
-        {
-            if (IsNullOrWhiteSpace(subject))
-            {
-                ModelState["subject.String"].Errors.Clear();
-                ModelState.AddModelError("", Messages.SubjectRequired);
-            }
+		[HttpPut, Route("{subject}/properties/{type}", Name = IdentityManagerConstants.RouteNames.UpdateRoleProperty)]
+		public async Task<IActionResult> SetPropertyAsync(string subject, string type)
+		{
+			if (IsNullOrWhiteSpace(subject))
+			{
+				ModelState["subject.String"].Errors.Clear();
+				ModelState.AddModelError("", Messages.SubjectRequired);
+			}
 
-            type = type.FromBase64UrlEncoded();
-            var value = await Request.Body.ReadAsStringAsync();
+			type = type.FromBase64UrlEncoded();
+			var value = await Request.Body.ReadAsStringAsync();
 
-            var meta = await GetMetadataAsync();
+			var meta = await GetMetadataAsync();
 
-            ValidateUpdateProperty(meta.RoleMetadata, type, value);
+			ValidateUpdateProperty(meta.RoleMetadata, type, value);
 
-            if (ModelState.IsValid)
-            {
-                var result = await service.SetRolePropertyAsync(subject, type, value);
+			if (ModelState.IsValid)
+			{
+				var result = await service.SetRolePropertyAsync(subject, type, value);
 
-                if (result.IsSuccess)
-                {
-                    return NoContent();
-                }
+				if (result.IsSuccess)
+				{
+					return NoContent();
+				}
 
-                ModelState.AddErrors(result);
-            }
+				ModelState.AddErrors(result);
+			}
 
-            return BadRequest(ModelState.ToError());
-        }
+			return BadRequest(ModelState.ToError());
+		}
 
-        private IEnumerable<string> ValidateCreateProperties(RoleMetadata roleMetadata, IEnumerable<PropertyValue> properties)
-        {
-            if (roleMetadata == null) throw new ArgumentNullException(nameof(roleMetadata));
-            properties = properties ?? Enumerable.Empty<PropertyValue>();
+		private IEnumerable<string> ValidateCreateProperties(RoleMetadata roleMetadata, IEnumerable<PropertyValue> properties)
+		{
+			if (roleMetadata == null) throw new ArgumentNullException(nameof(roleMetadata));
+			properties = properties ?? Enumerable.Empty<PropertyValue>();
 
-            var meta = roleMetadata.GetCreateProperties();
-            return meta.Validate(properties);
-        }
+			var meta = roleMetadata.GetCreateProperties();
+			return meta.Validate(properties);
+		}
 
-        private void ValidateUpdateProperty(RoleMetadata roleMetadata, string type, string value)
-        {
-            if (roleMetadata == null) throw new ArgumentNullException(nameof(roleMetadata));
+		private void ValidateUpdateProperty(RoleMetadata roleMetadata, string type, string value)
+		{
+			if (roleMetadata == null) throw new ArgumentNullException(nameof(roleMetadata));
 
-            if (IsNullOrWhiteSpace(type))
-            {
-                ModelState.AddModelError("", Messages.PropertyTypeRequired);
-                return;
-            }
+			if (IsNullOrWhiteSpace(type))
+			{
+				ModelState.AddModelError("", Messages.PropertyTypeRequired);
+				return;
+			}
 
-            var prop = roleMetadata.UpdateProperties.SingleOrDefault(x => x.Type == type);
-            if (prop == null)
-            {
-                ModelState.AddModelError("", Format(Messages.PropertyInvalid, type));
-            }
-            else
-            {
-                var error = prop.Validate(value);
-                if (error != null)
-                {
-                    ModelState.AddModelError("", error);
-                }
-            }
-        }
-    }
+			var prop = roleMetadata.UpdateProperties.SingleOrDefault(x => x.Type == type);
+			if (prop == null)
+			{
+				ModelState.AddModelError("", Format(Messages.PropertyInvalid, type));
+			}
+			else
+			{
+				var error = prop.Validate(value);
+				if (error != null)
+				{
+					ModelState.AddModelError("", error);
+				}
+			}
+		}
+	}
 }

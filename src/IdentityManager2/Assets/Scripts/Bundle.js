@@ -843,7 +843,7 @@ function(d){f.current.pathParams[d]||(b[d]=a[d])});a=d.extend({},this.current.pa
                 var props = properties.map(function (item) {
                     return {
                         type: item.meta.type,
-                        value: item.data
+                        value: item.data.toString()
                     };
                 });
                 idmUsers.createUser(props)
