@@ -24,7 +24,7 @@ namespace IdentityManager2.Api.Controllers
         public IActionResult Index()
         {
             return new EmbeddedHtmlResult(
-                Request.PathBase, 
+                this.config.RootPathBase + Request.PathBase, 
                 "IdentityManager2.Assets.Templates.index.html",
                 config.SecurityConfiguration);
         }
