@@ -14,16 +14,16 @@ namespace IdentityManager2.Api.Models
             if (url == null) throw new ArgumentNullException(nameof(url));
             if (userMetadata == null) throw new ArgumentNullException(nameof(userMetadata));
 
-            this["href"] = url.Link("CreateUser", null);
+            this["href"] = url.Link(IdentityManagerConstants.RouteNames.CreateUser, null);
             this["meta"] = userMetadata.GetCreateProperties();
         }
         
-        public CreateUserLink(LinkGenerator linkGenerator, string controllerName, UserMetadata userMetadata)
+        public CreateUserLink(LinkGenerator linkGenerator, string controllerName, string rootPathBase, UserMetadata userMetadata)
         {
             if (linkGenerator == null) throw new ArgumentNullException(nameof(linkGenerator));
             if (userMetadata == null) throw new ArgumentNullException(nameof(userMetadata));
 
-            this["href"] = linkGenerator.GetPathByAction("CreateUser", controllerName);
+            this["href"] = linkGenerator.GetPathByAction(IdentityManagerConstants.RouteNames.CreateUser, controllerName, null, rootPathBase);
             this["meta"] = userMetadata.GetCreateProperties();
         }
     }

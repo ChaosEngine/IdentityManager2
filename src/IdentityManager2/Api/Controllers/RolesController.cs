@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityManager2.Api.Models;
+using IdentityManager2.Configuration;
 using IdentityManager2.Core;
 using IdentityManager2.Core.Metadata;
 using IdentityManager2.Extensions;
@@ -21,11 +22,13 @@ namespace IdentityManager2.Api.Controllers
 	{
 		private readonly IIdentityManagerService service;
 		private readonly LinkGenerator linkGenerator;
+		private readonly IdentityManagerOptions config;
 
-		public RolesController(IIdentityManagerService service, LinkGenerator linkGenerator)
+		public RolesController(IIdentityManagerService service, LinkGenerator linkGenerator, IdentityManagerOptions config)
 		{
 			this.service = service ?? throw new ArgumentNullException(nameof(service));
 			this.linkGenerator = linkGenerator ?? throw new ArgumentNullException(nameof(linkGenerator));
+			this.config = config;
 		}
 
 		public IActionResult MethodNotAllowed()
@@ -63,7 +66,7 @@ namespace IdentityManager2.Api.Controllers
 				try
 				{
 					return Ok(new RoleQueryResultResource(result.Result, linkGenerator, ControllerContext.ActionDescriptor.ControllerName,
-						meta.RoleMetadata));
+						this.config.RootPathBase, meta.RoleMetadata));
 				}
 				catch (Exception exp)
 				{
@@ -98,7 +101,7 @@ namespace IdentityManager2.Api.Controllers
 				{
 					var url = linkGenerator.GetPathByAction(IdentityManagerConstants.RouteNames.GetRole,
                         ControllerContext.ActionDescriptor.ControllerName,
-                        new { subject = result.Result.Subject });
+                        new { subject = result.Result.Subject }, this.config.RootPathBase);
 
 					var resource = new
 					{
@@ -144,7 +147,7 @@ namespace IdentityManager2.Api.Controllers
 				}
 
 				var response = Ok(new RoleDetailResource(result.Result, linkGenerator,
-                    ControllerContext.ActionDescriptor.ControllerName,
+                    ControllerContext.ActionDescriptor.ControllerName, this.config.RootPathBase,
                     meta.RoleMetadata));
 
 				return response;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using IdentityManager2.Api.Models;
+using IdentityManager2.Configuration;
 using IdentityManager2.Core.Metadata;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,11 +18,13 @@ namespace IdentityManager2.Api.Controllers
 		private readonly IIdentityManagerService userManager;
 		private readonly LinkGenerator linkGenerator;
 		private IdentityManagerMetadata metadata;
+		private readonly IdentityManagerOptions config;
 
-		public MetaController(IIdentityManagerService userManager, LinkGenerator linkGenerator)
+		public MetaController(IIdentityManagerService userManager, LinkGenerator linkGenerator, IdentityManagerOptions config)
 		{
 			this.userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
 			this.linkGenerator = linkGenerator;
+			this.config = config;
 		}
 
 		private async Task<IdentityManagerMetadata> GetMetadataAsync()
@@ -42,19 +45,24 @@ namespace IdentityManager2.Api.Controllers
 			var meta = await GetMetadataAsync();
 			var data = new Dictionary<string, object> { { "currentUser", new { username = User.Identity.Name } } };
 
-			var links = new Dictionary<string, object> { ["users"] = this.linkGenerator.GetPathByAction("GetUsers", "Users") };
+			var links = new Dictionary<string, object>
+			{
+				["users"] = this.linkGenerator.GetPathByAction(IdentityManagerConstants.RouteNames.GetUsers, "Users", null,
+					this.config.RootPathBase)
+			};
 
 			if (meta.RoleMetadata.SupportsListing)
 			{
-				links["roles"] = this.linkGenerator.GetPathByAction("GetRoles", "Roles");
+				links["roles"] = this.linkGenerator.GetPathByAction(IdentityManagerConstants.RouteNames.GetRoles, "Roles", null,
+					this.config.RootPathBase);
 			}
 			if (meta.UserMetadata.SupportsCreate)
 			{
-				links["createUser"] = new CreateUserLink(this.linkGenerator, "Users", meta.UserMetadata);
+				links["createUser"] = new CreateUserLink(this.linkGenerator, "Users", this.config.RootPathBase, meta.UserMetadata);
 			}
 			if (meta.RoleMetadata.SupportsCreate)
 			{
-				links["createRole"] = new CreateRoleLink(this.linkGenerator, "Roles", meta.RoleMetadata);
+				links["createRole"] = new CreateRoleLink(this.linkGenerator, "Roles", this.config.RootPathBase, meta.RoleMetadata);
 			}
 
 			return Ok(new

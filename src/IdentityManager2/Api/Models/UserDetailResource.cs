@@ -30,20 +30,20 @@ namespace IdentityManager2.Api.Models
 			Links = links;
 		}
 
-		public UserDetailResource(UserDetail user, LinkGenerator linkGenerator, string controllerName, IdentityManagerMetadata idmMeta, RoleSummary[] roles)
+		public UserDetailResource(UserDetail user, LinkGenerator linkGenerator, string controllerName, string rootPathBase,
+			IdentityManagerMetadata idmMeta, RoleSummary[] roles)
 		{
 			if (user == null) throw new ArgumentNullException(nameof(user));
 			if (linkGenerator == null) throw new ArgumentNullException(nameof(linkGenerator));
 			if (idmMeta == null) throw new ArgumentNullException(nameof(idmMeta));
 
-			Data = new UserDetailDataResource(user, linkGenerator, controllerName, idmMeta, roles);
+			Data = new UserDetailDataResource(user, linkGenerator, controllerName, rootPathBase, idmMeta, roles);
 
 			var links = new Dictionary<string, string>();
 			if (idmMeta.UserMetadata.SupportsDelete)
 			{
-				// links["delete"] = url.Link(IdentityManagerConstants.RouteNames.DeleteUser, new { subject = user.Subject });
 				links["delete"] = linkGenerator.GetPathByAction(IdentityManagerConstants.RouteNames.DeleteUser,
-					controllerName, new { subject = user.Subject });
+					controllerName, new { subject = user.Subject }, rootPathBase);
 			}
 			Links = links;
 		}
@@ -142,8 +142,8 @@ namespace IdentityManager2.Api.Models
 			}
 		}
 
-		public UserDetailDataResource(UserDetail user, LinkGenerator linkGenerator, string controllerName,
-            IdentityManagerMetadata meta, RoleSummary[] roles)
+		public UserDetailDataResource(UserDetail user, LinkGenerator linkGenerator, string controllerName, string rootPathBase,
+			IdentityManagerMetadata meta, RoleSummary[] roles)
 		{
 			if (user == null) throw new ArgumentNullException(nameof(user));
 			if (linkGenerator == null) throw new ArgumentNullException(nameof(linkGenerator));
@@ -167,12 +167,12 @@ namespace IdentityManager2.Api.Models
 						Links = new
 						{
 							update = linkGenerator.GetPathByRouteValues(IdentityManagerConstants.RouteNames.UpdateUserProperty,
-                                //controllerName,
 								new
 								{
 									subject = user.Subject,
 									type = p.Type.ToBase64UrlEncoded()
-								}
+								},
+								rootPathBase
 							),
 						}
 					};
@@ -200,9 +200,9 @@ namespace IdentityManager2.Api.Models
 						links = new
 						{
 							add = linkGenerator.GetPathByAction(IdentityManagerConstants.RouteNames.AddRole, controllerName,
-                                new { subject = user.Subject, role = r.Name.ToBase64UrlEncoded() }),
+								new { subject = user.Subject, role = r.Name.ToBase64UrlEncoded() }, rootPathBase),
 							remove = linkGenerator.GetPathByAction(IdentityManagerConstants.RouteNames.RemoveRole, controllerName,
-                                new { subject = user.Subject, role = r.Name.ToBase64UrlEncoded() })
+								new { subject = user.Subject, role = r.Name.ToBase64UrlEncoded() }, rootPathBase)
 						}
 					};
 				this["roles"] = query.ToArray();
@@ -218,13 +218,14 @@ namespace IdentityManager2.Api.Models
 						Links = new
 						{
 							delete = linkGenerator.GetPathByAction(IdentityManagerConstants.RouteNames.RemoveClaim,
-                            controllerName,
-                            new
-							{
-								subject = user.Subject,
-								type = c.Type.ToBase64UrlEncoded(),
-								value = c.Value.ToBase64UrlEncoded()
-							})
+								controllerName,
+								new
+								{
+									subject = user.Subject,
+									type = c.Type.ToBase64UrlEncoded(),
+									value = c.Value.ToBase64UrlEncoded()
+								},
+								rootPathBase)
 						}
 					};
 
@@ -234,8 +235,9 @@ namespace IdentityManager2.Api.Models
 					Links = new
 					{
 						create = linkGenerator.GetPathByAction(IdentityManagerConstants.RouteNames.AddClaim,
-                            controllerName,
-                            new { subject = user.Subject })
+							controllerName,
+							new { subject = user.Subject },
+							rootPathBase)
 					}
 				};
 			}

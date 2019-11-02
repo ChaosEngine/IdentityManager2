@@ -30,18 +30,19 @@ namespace IdentityManager2.Api.Models
 			Links = links;
 		}
 
-		public UserQueryResultResource(QueryResult<UserSummary> result, LinkGenerator linkGenerator, string controllerName, UserMetadata meta)
+		public UserQueryResultResource(QueryResult<UserSummary> result, LinkGenerator linkGenerator, string controllerName,
+			string rootPathBase, UserMetadata meta)
 		{
 			if (result == null) throw new ArgumentNullException(nameof(result));
 			if (linkGenerator == null) throw new ArgumentNullException(nameof(linkGenerator));
 			if (meta == null) throw new ArgumentNullException(nameof(meta));
 
-			Data = new UserQueryResultResourceData(result, linkGenerator, controllerName, meta);
+			Data = new UserQueryResultResourceData(result, linkGenerator, controllerName, rootPathBase, meta);
 
 			var links = new Dictionary<string, object>();
 			if (meta.SupportsCreate)
 			{
-				links["create"] = new CreateUserLink(linkGenerator, controllerName, meta);
+				links["create"] = new CreateUserLink(linkGenerator, controllerName, rootPathBase, meta);
 			}
 
 			Links = links;
@@ -75,7 +76,8 @@ namespace IdentityManager2.Api.Models
 			}
 		}
 
-		public UserQueryResultResourceData(QueryResult<UserSummary> result, LinkGenerator linkGenerator, string controllerName, UserMetadata meta)
+		public UserQueryResultResourceData(QueryResult<UserSummary> result, LinkGenerator linkGenerator, string controllerName,
+			string rootPathBase, UserMetadata meta)
 		{
 			if (result == null) throw new ArgumentNullException(nameof(result));
 			if (linkGenerator == null) throw new ArgumentNullException(nameof(linkGenerator));
@@ -88,12 +90,12 @@ namespace IdentityManager2.Api.Models
 				var links = new Dictionary<string, string>
 				{
 					{"detail", linkGenerator.GetPathByAction(IdentityManagerConstants.RouteNames.GetUser, controllerName,
-                        new {subject = user.Data.Subject})}
+						new {subject = user.Data.Subject}, rootPathBase)}
 				};
 				if (meta.SupportsDelete)
 				{
 					links.Add("delete", linkGenerator.GetPathByAction(IdentityManagerConstants.RouteNames.DeleteUser, controllerName,
-                        new { subject = user.Data.Subject }));
+						new { subject = user.Data.Subject }, rootPathBase));
 				}
 
 				user.Links = links;

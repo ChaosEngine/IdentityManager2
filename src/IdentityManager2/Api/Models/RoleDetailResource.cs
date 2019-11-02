@@ -30,19 +30,20 @@ namespace IdentityManager2.Api.Models
             Links = links;
         }
 
-        public RoleDetailResource(RoleDetail role, LinkGenerator linkGenerator, string controllerName, RoleMetadata meta)
+        public RoleDetailResource(RoleDetail role, LinkGenerator linkGenerator, string controllerName, string rootPathBase,
+            RoleMetadata meta)
         {
             if (role == null) throw new ArgumentNullException(nameof(role));
             if (linkGenerator == null) throw new ArgumentNullException(nameof(linkGenerator));
             if (meta == null) throw new ArgumentNullException(nameof(meta));
 
-            Data = new RoleDetailDataResource(role, linkGenerator, controllerName, meta);
+            Data = new RoleDetailDataResource(role, linkGenerator, controllerName, rootPathBase, meta);
 
             var links = new Dictionary<string, string>();
             if (meta.SupportsDelete)
             {
                 links["delete"] = linkGenerator.GetPathByAction(IdentityManagerConstants.RouteNames.DeleteRole, controllerName,
-                    new { subject = role.Subject });
+                    new { subject = role.Subject }, rootPathBase);
             }
             Links = links;
         }
@@ -87,7 +88,8 @@ namespace IdentityManager2.Api.Models
             }
         }
 
-        public RoleDetailDataResource(RoleDetail role, LinkGenerator linkGenerator, string controllerName, RoleMetadata meta)
+        public RoleDetailDataResource(RoleDetail role, LinkGenerator linkGenerator, string controllerName, string rootPathBase,
+            RoleMetadata meta)
         {
             if (role == null) throw new ArgumentNullException(nameof(role));
             if (linkGenerator == null) throw new ArgumentNullException(nameof(linkGenerator));
@@ -114,7 +116,8 @@ namespace IdentityManager2.Api.Models
                                 {
                                     subject = role.Subject,
                                     type = p.Type.ToBase64UrlEncoded()
-                                })
+                                },
+                                rootPathBase)
                         }
                     };
 

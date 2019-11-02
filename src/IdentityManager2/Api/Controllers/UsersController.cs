@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityManager2.Api.Models;
+using IdentityManager2.Configuration;
 using IdentityManager2.Core;
 using IdentityManager2.Core.Metadata;
 using IdentityManager2.Extensions;
@@ -23,14 +24,14 @@ namespace IdentityManager2.Api.Controllers
 	{
 		private readonly IIdentityManagerService service;
 		private readonly LinkGenerator linkGenerator;
-		// private readonly IActionContextAccessor actionContextAccessor;
+		private readonly IdentityManagerOptions config;
 		private IdentityManagerMetadata metadata;
 
-		public UsersController(IIdentityManagerService service, LinkGenerator linkGenerator/*, IActionContextAccessor actionContextAccessor*/)
+		public UsersController(IIdentityManagerService service, LinkGenerator linkGenerator, IdentityManagerOptions config)
 		{
 			this.service = service ?? throw new ArgumentNullException(nameof(service));
 			this.linkGenerator = linkGenerator ?? throw new ArgumentNullException(nameof(linkGenerator));
-			// this.actionContextAccessor = actionContextAccessor ?? throw new ArgumentNullException(nameof(actionContextAccessor));
+			this.config = config;
 		}
 
 		public IActionResult MethodNotAllowed()
@@ -60,6 +61,7 @@ namespace IdentityManager2.Api.Controllers
 				var resource = new UserQueryResultResource(result.Result,
 					this.linkGenerator,
 					ControllerContext.ActionDescriptor.ControllerName,
+					this.config.RootPathBase,
 					meta.UserMetadata);
 				return Ok(resource);
 			}
@@ -88,9 +90,8 @@ namespace IdentityManager2.Api.Controllers
 				var result = await service.CreateUserAsync(properties);
 				if (result.IsSuccess)
 				{
-					//var url = urlHelper.Link(IdentityManagerConstants.RouteNames.GetUser, new { subject = result.Result.Subject });
 					var url = linkGenerator.GetPathByAction(HttpContext, IdentityManagerConstants.RouteNames.GetUser, null,
-						new { subject = result.Result.Subject });
+						new { subject = result.Result.Subject }, this.config.RootPathBase);
 					var resource = new
 					{
 						Data = new { subject = result.Result.Subject },
@@ -145,7 +146,7 @@ namespace IdentityManager2.Api.Controllers
 				}
 
 				return Ok(new UserDetailResource(result.Result, linkGenerator, ControllerContext.ActionDescriptor.ControllerName,
-					meta, roles));
+					config.RootPathBase, meta, roles));
 			}
 
 			return BadRequest(result.ToError());

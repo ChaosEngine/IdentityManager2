@@ -30,18 +30,18 @@ namespace IdentityManager2.Api.Models
         }
 
         public RoleQueryResultResource(QueryResult<RoleSummary> result, LinkGenerator linkGenerator, string controllerName,
-            RoleMetadata meta)
+            string rootPathBase, RoleMetadata meta)
         {
             if (result == null) throw new ArgumentNullException(nameof(result));
             if (linkGenerator == null) throw new ArgumentNullException(nameof(linkGenerator));
             if (meta == null) throw new ArgumentNullException(nameof(meta));
 
-            Data = new RoleQueryResultResourceData(result, linkGenerator, controllerName, meta);
+            Data = new RoleQueryResultResourceData(result, linkGenerator, controllerName, rootPathBase, meta);
 
             var links = new Dictionary<string, object>();
             if (meta.SupportsCreate)
             {
-                links["create"] = new CreateRoleLink(linkGenerator, controllerName, meta);
+                links["create"] = new CreateRoleLink(linkGenerator, controllerName, rootPathBase, meta);
             };
             Links = links;
         }
@@ -75,7 +75,7 @@ namespace IdentityManager2.Api.Models
         }
 
         public RoleQueryResultResourceData(QueryResult<RoleSummary> result, LinkGenerator linkGenerator, string controllerName,
-            RoleMetadata meta)
+            string rootPathBase, RoleMetadata meta)
         {
             if (result == null) throw new ArgumentNullException(nameof(result));
             if (linkGenerator == null) throw new ArgumentNullException(nameof(linkGenerator));
@@ -88,13 +88,13 @@ namespace IdentityManager2.Api.Models
                 var links = new Dictionary<string, string>
                 {
                     { "detail", linkGenerator.GetPathByAction(IdentityManagerConstants.RouteNames.GetRole, controllerName,
-                        new { subject = role.Data.Subject }) }
+                        new { subject = role.Data.Subject }, rootPathBase) }
                 };
 
                 if (meta.SupportsDelete)
                 {
                     links.Add("delete", linkGenerator.GetPathByAction(IdentityManagerConstants.RouteNames.DeleteRole, controllerName,
-                        new { subject = role.Data.Subject }));
+                        new { subject = role.Data.Subject }, rootPathBase));
                 }
                 role.Links = links;
             }
