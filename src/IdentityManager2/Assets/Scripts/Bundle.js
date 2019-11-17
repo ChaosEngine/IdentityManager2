@@ -1110,7 +1110,7 @@ function(d){f.current.pathParams[d]||(b[d]=a[d])});a=d.extend({},this.current.pa
     config.$inject = ["PathBase", "$routeProvider"];
     app.config(config);
 
-    function LayoutCtrl($rootScope, PathBase, idmApi, $location, $window, idmErrorService, ShowLoginButton) {
+    function LayoutCtrl($rootScope, PathBase, idmApi, $location, $window, idmErrorService, ShowLoginButton, TitleNavBarLinkTarget) {
         $rootScope.PathBase = PathBase;
         $rootScope.layout = {};
 
@@ -1120,6 +1120,7 @@ function(d){f.current.pathParams[d]||(b[d]=a[d])});a=d.extend({},this.current.pa
             $rootScope.layout.links = null;
             $rootScope.layout.showLogout = ShowLoginButton; // TODO: logout button
             $rootScope.layout.showLogin = false; // TODO: login button
+            $rootScope.layout.titleNavBarLinkTarget = TitleNavBarLinkTarget;
         }
 
         function load() {
@@ -1144,7 +1145,7 @@ function(d){f.current.pathParams[d]||(b[d]=a[d])});a=d.extend({},this.current.pa
             }
         }
     }
-    LayoutCtrl.$inject = ["$rootScope", "PathBase", "idmApi", "$location", "$window", "idmErrorService", "ShowLoginButton"];
+    LayoutCtrl.$inject = ["$rootScope", "PathBase", "idmApi", "$location", "$window", "idmErrorService", "ShowLoginButton", "TitleNavBarLinkTarget"];
     app.controller("LayoutCtrl", LayoutCtrl);
 
     function HomeCtrl(ShowLoginButton, $routeParams) {
