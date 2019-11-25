@@ -23,8 +23,8 @@ namespace IdentityManager2.Api.Controllers
         [Route("", Name = IdentityManagerConstants.RouteNames.Home)]
         public IActionResult Index()
         {
-            return new EmbeddedHtmlResult(
-                this.config.RootPathBase + Request.PathBase, 
+            return new EmbeddedHtmlResult(//this.config.RootPathBase +
+                Request.PathBase, 
                 "IdentityManager2.Assets.Templates.index.html",
                 config);
         }
