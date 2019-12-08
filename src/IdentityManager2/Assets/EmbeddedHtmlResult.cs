@@ -12,13 +12,13 @@ namespace IdentityManager2.Assets
     {
         private readonly string path;
         private readonly string file;
-        private readonly SecurityConfiguration securityConfiguration;
+        private readonly IdentityManagerOptions options;
 
-        public EmbeddedHtmlResult(PathString pathBase, string file, SecurityConfiguration securityConfiguration)
+        public EmbeddedHtmlResult(PathString pathBase, string file, IdentityManagerOptions options)
         {
             path = pathBase.Value;
             this.file = file;
-            this.securityConfiguration = securityConfiguration;
+            this.options = options;
         }
 
         public async Task ExecuteResultAsync(ActionContext context)
@@ -30,7 +30,8 @@ namespace IdentityManager2.Assets
                     model = JsonSerializer.Serialize(new PageModelParams
                     {
                         PathBase = path,
-                        ShowLoginButton = securityConfiguration.ShowLoginButton
+                        ShowLoginButton = options.SecurityConfiguration.ShowLoginButton,
+                        TitleNavBarLinkTarget = options.TitleNavBarLinkTarget
                     })
                 });
 
