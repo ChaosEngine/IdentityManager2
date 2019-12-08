@@ -18,33 +18,36 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddControllersWithViews()
                 .AddNewtonsoftJson();
-            
-            // IdentityManager API authentication scheme
-            services.AddAuthentication()
-                .AddCookie(IdentityManagerConstants.LocalApiScheme, options =>
-                {
-                    options.Cookie.Name = IdentityManagerConstants.LocalApiScheme;
-                    options.Cookie.SameSite = SameSiteMode.Strict;
-                    options.Cookie.HttpOnly = true;
-                    options.Cookie.IsEssential = true;
-                    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 
-                    // TODO: API Cookie: SlidingExpiration
-                    // TODO: API Cookie: ExpireTimeSpan
-
-                    options.LoginPath = "/api/login";
-
-                    options.Events.OnRedirectToLogin = context =>
+            if (!string.IsNullOrEmpty(identityManagerOptions.SecurityConfiguration.AuthenticationScheme))
+            {
+                // IdentityManager API authentication scheme
+                services.AddAuthentication()
+                    .AddCookie(identityManagerOptions.SecurityConfiguration.AuthenticationScheme, options =>
                     {
-                        context.Response.StatusCode = 401;
-                        return Task.CompletedTask;
-                    };
-                    options.Events.OnRedirectToAccessDenied = context =>
-                    {
-                        context.Response.StatusCode = 403;
-                        return Task.CompletedTask;
-                    };
-                });
+                        options.Cookie.Name = identityManagerOptions.SecurityConfiguration.AuthenticationScheme;
+                        options.Cookie.SameSite = SameSiteMode.Strict;
+                        options.Cookie.HttpOnly = true;
+                        options.Cookie.IsEssential = true;
+                        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+
+                        // TODO: API Cookie: SlidingExpiration
+                        // TODO: API Cookie: ExpireTimeSpan
+
+                        options.LoginPath = "/api/login";
+
+                        options.Events.OnRedirectToLogin = context =>
+                        {
+                            context.Response.StatusCode = 401;
+                            return Task.CompletedTask;
+                        };
+                        options.Events.OnRedirectToAccessDenied = context =>
+                        {
+                            context.Response.StatusCode = 403;
+                            return Task.CompletedTask;
+                        };
+                    });
+            }
 
             // IdentityManager API authorization scheme
             services.AddAuthorization(options =>
@@ -58,7 +61,8 @@ namespace Microsoft.Extensions.DependencyInjection
                     config.RequireClaim(identityManagerOptions.SecurityConfiguration.RoleClaimType, identityManagerOptions.SecurityConfiguration.AdminRoleName);
 
                     // IdentityManager authentication scheme
-                    config.AddAuthenticationSchemes(IdentityManagerConstants.LocalApiScheme);
+                    if (!string.IsNullOrEmpty(identityManagerOptions.SecurityConfiguration.AuthenticationScheme))
+                        config.AddAuthenticationSchemes(identityManagerOptions.SecurityConfiguration.AuthenticationScheme);
                 });
             });
 
