@@ -32,7 +32,8 @@ namespace IdentityManager2.Api.Controllers
                 Model = JsonSerializer.Serialize(new PageModelParams
                 {
                     PathBase = Request.PathBase,
-                    ShowLoginButton = !authResult.Succeeded
+                    ShowLoginButton = !authResult.Succeeded,
+                    TitleNavBarLinkTarget = this.config.TitleNavBarLinkTarget
                 })
             });
         }

@@ -18,7 +18,7 @@
     config.$inject = ["PathBase", "$routeProvider"];
     app.config(config);
 
-    function LayoutCtrl($rootScope, PathBase, idmApi, $location, $window, idmErrorService, ShowLoginButton) {
+    function LayoutCtrl($rootScope, PathBase, idmApi, $location, $window, idmErrorService, ShowLoginButton, TitleNavBarLinkTarget) {
         $rootScope.PathBase = PathBase;
         $rootScope.layout = {};
 
@@ -30,6 +30,7 @@
             $rootScope.layout.links = null;
             $rootScope.layout.showLogout = !ShowLoginButton;
             $rootScope.layout.showLogin = ShowLoginButton;
+            $rootScope.layout.titleNavBarLinkTarget = TitleNavBarLinkTarget;
         }
 
         function load() {
@@ -59,6 +60,6 @@
             $window.location = PathBase + "/api/logout";
         };
     }
-    LayoutCtrl.$inject = ["$rootScope", "PathBase", "idmApi", "$location", "$window", "idmErrorService", "ShowLoginButton"];
+    LayoutCtrl.$inject = ["$rootScope", "PathBase", "idmApi", "$location", "$window", "idmErrorService", "ShowLoginButton", "TitleNavBarLinkTarget"];
     app.controller("LayoutCtrl", LayoutCtrl);
 })(angular);
