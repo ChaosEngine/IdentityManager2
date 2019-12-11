@@ -12,6 +12,7 @@ namespace IdentityManager2.Configuration
         public string HostChallengeType { get; set; }
         public string AdditionalSignOutType { get; set; }
         public string AuthenticationScheme { get; set; }
+        public string PageRouteAttribute { get; set; }
 
         public string NameClaimType { get; set; }
         public string RoleClaimType { get; set; }
@@ -27,6 +28,7 @@ namespace IdentityManager2.Configuration
             RoleClaimType = IdentityManagerConstants.ClaimTypes.Role;
             AdminRoleName = IdentityManagerConstants.AdminRoleName;
             AuthenticationScheme = IdentityManagerConstants.LocalApiScheme;
+            PageRouteAttribute = null;
 
             ShowLoginButton = true;
             LoginPath = "/api/login";
