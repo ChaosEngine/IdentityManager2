@@ -6,9 +6,10 @@
         public string Model { get; set; }
     }
 
-    public class PageModelParams
+    class PageModelParams
     {
         public string PathBase { get; set; }
         public bool ShowLoginButton { get; set; }
+        public string TitleNavBarLinkTarget { get; set; }
     }
 }
