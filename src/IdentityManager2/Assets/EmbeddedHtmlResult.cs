@@ -31,7 +31,9 @@ namespace IdentityManager2.Assets
                     {
                         PathBase = path,
                         ShowLoginButton = options.SecurityConfiguration.ShowLoginButton,
-                        TitleNavBarLinkTarget = options.TitleNavBarLinkTarget
+                        TitleNavBarLinkTarget = this.options.TitleNavBarLinkTarget,
+                        LoginPath = this.options.SecurityConfiguration.LoginPath,
+                        LogoutPath = this.options.SecurityConfiguration.LogoutPath
                     })
                 });
 

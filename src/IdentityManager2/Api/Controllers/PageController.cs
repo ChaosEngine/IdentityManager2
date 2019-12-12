@@ -33,7 +33,9 @@ namespace IdentityManager2.Api.Controllers
                 {
                     PathBase = Request.PathBase,
                     ShowLoginButton = !authResult.Succeeded,
-                    TitleNavBarLinkTarget = this.config.TitleNavBarLinkTarget
+                    TitleNavBarLinkTarget = this.config.TitleNavBarLinkTarget,
+                    LoginPath = this.config.SecurityConfiguration.LoginPath,
+                    LogoutPath = this.config.SecurityConfiguration.LogoutPath
                 })
             });
         }
