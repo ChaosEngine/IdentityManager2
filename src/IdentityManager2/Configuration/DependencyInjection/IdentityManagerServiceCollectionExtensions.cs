@@ -33,16 +33,17 @@ namespace Microsoft.Extensions.DependencyInjection
                         // TODO: API Cookie: SlidingExpiration
                         // TODO: API Cookie: ExpireTimeSpan
 
-                        options.LoginPath = "/api/login";
+                        options.LoginPath = identityManagerOptions.SecurityConfiguration.LoginPath;
+                        options.LogoutPath = identityManagerOptions.SecurityConfiguration.LogoutPath;
 
                         options.Events.OnRedirectToLogin = context =>
                         {
-                            context.Response.StatusCode = 401;
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                             return Task.CompletedTask;
                         };
                         options.Events.OnRedirectToAccessDenied = context =>
                         {
-                            context.Response.StatusCode = 403;
+                            context.Response.StatusCode = StatusCodes.Status403Forbidden;
                             return Task.CompletedTask;
                         };
                     });
@@ -65,7 +66,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 });
             });
 
-            identityManagerOptions.SecurityConfiguration.Configure(services);
+            if (!string.IsNullOrEmpty(identityManagerOptions.SecurityConfiguration.AuthenticationScheme))
+                identityManagerOptions.SecurityConfiguration.Configure(services);
 
             return new IdentityManagerBuilder(services);
         }
