@@ -143,3 +143,6 @@ img.logo-footer {
   display: inline-block;
   width: 200px;
 }
+.modal-backdrop.show {
+  opacity: 0.5;
+}
