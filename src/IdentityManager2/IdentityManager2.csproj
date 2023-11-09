@@ -13,6 +13,7 @@
     <PackageProjectUrl>https://github.com/IdentityManager/IdentityManager2</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/IdentityManager/IdentityManager2/blob/master/LICENSE</PackageLicenseUrl>
     <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
+    <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
 
   <ItemGroup>
