@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using IdentityManager2.Api.Models;
 using IdentityManager2.Core.Metadata;
@@ -37,9 +38,9 @@ namespace IdentityManager2.Api.Controllers
         public async Task<IActionResult> Get()
         {
             var meta = await GetMetadataAsync();
-            var data = new Dictionary<string, object> {{"currentUser", new {username = User.Identity.Name}}};
-            
-            var links = new Dictionary<string, object> {["users"] = Url.Link("GetUsers", null)};
+            var data = new Dictionary<string, object> { { "currentUser", new AnonymousUserName{ username = User.Identity.Name } } };
+
+            var links = new Dictionary<string, object> { ["users"] = Url.Link("GetUsers", null) };
 
             if (meta.RoleMetadata.SupportsListing)
             {
@@ -54,11 +55,11 @@ namespace IdentityManager2.Api.Controllers
                 links["createRole"] = new CreateRoleLink(Url, meta.RoleMetadata);
             }
 
-            return Ok(new
+            return Json(new MetaResult
             {
                 Data = data,
                 Links = links
-            });
+            }, MetaResult_Context.Default.Options);
         }
     }
 }

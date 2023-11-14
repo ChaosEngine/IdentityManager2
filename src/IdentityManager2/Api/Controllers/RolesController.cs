@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using IdentityManager2.Api.Models;
 using IdentityManager2.Core;
@@ -54,7 +55,7 @@ namespace IdentityManager2.Api.Controllers
             {
                 try
                 {
-                    return Ok(new RoleQueryResultResource(result.Result, Url, meta.RoleMetadata));
+                    return Json(new RoleQueryResultResource(result.Result, Url, meta.RoleMetadata), RoleQueryResultResource_Context.Default.Options);
                 }
                 catch (Exception exp)
                 {
@@ -87,14 +88,14 @@ namespace IdentityManager2.Api.Controllers
                 var result = await service.CreateRoleAsync(properties);
                 if (result.IsSuccess)
                 {
-                    var url = Url.Link(IdentityManagerConstants.RouteNames.GetRole, new { subject = result.Result.Subject });
+                    var url = Url.Link(IdentityManagerConstants.RouteNames.GetRole, new AnonymousSubject { subject = result.Result.Subject });
 
-                    var resource = new
+                    var resource = new AnonymousCreatedRole
                     {
-                        Data = new { subject = result.Result.Subject },
-                        Links = new { detail = url }
+                        Data = new AnonymousSubject { subject = result.Result.Subject },
+                        Links = new AnonymousDetail { detail = url }
                     };
-                    return Created(url, resource);
+                    return Created(url, JsonSerializer.Serialize(resource, AnonymousCreatedRole_Context.Default.AnonymousCreatedRole));
                 }
 
                 ModelState.AddModelError("", errors.ToString());
@@ -132,7 +133,7 @@ namespace IdentityManager2.Api.Controllers
                     return NotFound();
                 }
 
-                var response = Ok(new RoleDetailResource(result.Result, Url, meta.RoleMetadata));
+                var response = Json(new RoleDetailResource(result.Result, Url, meta.RoleMetadata), RoleDetailResource_Context.Default.Options);
 
 
                 return response;

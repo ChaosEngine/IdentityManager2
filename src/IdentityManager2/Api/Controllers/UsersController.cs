@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using IdentityManager2.Api.Models;
 using IdentityManager2.Core;
@@ -47,7 +48,7 @@ namespace IdentityManager2.Api.Controllers
                 var meta = await GetMetadataAsync();
 
                 var resource = new UserQueryResultResource(result.Result, Url, meta.UserMetadata);
-                return Ok(resource);
+                return Json(resource, UserQueryResultResource_Context.Default.Options);
             }
 
             return BadRequest(result.ToError());
@@ -74,14 +75,14 @@ namespace IdentityManager2.Api.Controllers
                 var result = await service.CreateUserAsync(properties);
                 if (result.IsSuccess)
                 {
-                    var url = Url.Link(IdentityManagerConstants.RouteNames.GetUser, new {subject = result.Result.Subject});
-                    var resource = new
+                    var url = Url.Link(IdentityManagerConstants.RouteNames.GetUser, new AnonymousSubject {subject = result.Result.Subject});
+                    var resource = new AnonymousCreatedUser
                     {
-                        Data = new {subject = result.Result.Subject},
-                        Links = new {detail = url}
+                        Data = new AnonymousSubject {subject = result.Result.Subject},
+                        Links = new AnonymousDetail {detail = url}
                     };
 
-                    return Created(url, resource);
+                    return Created(url, JsonSerializer.Serialize(resource, AnonymousCreatedUser_Context.Default.AnonymousCreatedUser));
                 }
 
                 ModelState.AddModelError("errors", result.Errors.Aggregate((workingSentence, next) => workingSentence + " " + next));
@@ -127,7 +128,7 @@ namespace IdentityManager2.Api.Controllers
                     roles = roleResult.Result.Items.ToArray();
                 }
 
-                return Ok(new UserDetailResource(result.Result, Url, meta, roles));
+                return Json(new UserDetailResource(result.Result, Url, meta, roles), UserDetailResource_Context.Default.Options);
             }
 
             return BadRequest(result.ToError());

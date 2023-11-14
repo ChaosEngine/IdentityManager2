@@ -34,7 +34,7 @@ namespace IdentityManager2.Assets
                         TitleNavBarLinkTarget = this.options.TitleNavBarLinkTarget,
                         LoginPath = this.options.SecurityConfiguration.LoginPath,
                         LogoutPath = this.options.SecurityConfiguration.LogoutPath
-                    })
+                    }, PageModelParams_Context.Default.PageModelParams)
                 });
 
             context.HttpContext.Response.ContentType = "text/html";

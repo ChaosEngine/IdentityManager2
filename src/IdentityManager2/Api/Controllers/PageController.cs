@@ -36,7 +36,7 @@ namespace IdentityManager2.Api.Controllers
                     TitleNavBarLinkTarget = this.config.TitleNavBarLinkTarget,
                     LoginPath = this.config.SecurityConfiguration.LoginPath,
                     LogoutPath = this.config.SecurityConfiguration.LogoutPath
-                })
+                }, PageModelParams_Context.Default.PageModelParams)
             });
         }
 
