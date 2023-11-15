@@ -10,6 +10,7 @@ using IdentityManager2.Extensions;
 using IdentityManager2.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static System.String;
 
 namespace IdentityManager2.Api.Controllers
@@ -87,7 +88,7 @@ namespace IdentityManager2.Api.Controllers
 
                 ModelState.AddModelError("errors", result.Errors.Aggregate((workingSentence, next) => workingSentence + " " + next));
                 if(result.Errors.Count > 0)
-                    return BadRequest(ModelState);
+                    return BadRequest(JsonSerializer.Serialize(ModelState, ModelStateDictionary_Context.Default.ModelStateDictionary));
             }
 
             return BadRequest(400);

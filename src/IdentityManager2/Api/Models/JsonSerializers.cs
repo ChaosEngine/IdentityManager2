@@ -3,6 +3,8 @@ using System.Text.Json.Serialization;
 using IdentityManager2.Api.Models;
 using IdentityManager2.Core;
 using IdentityManager2.Core.Metadata;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 [JsonSerializable(typeof(PageModelParams))]
 partial class PageModelParams_Context : JsonSerializerContext { }
@@ -73,3 +75,7 @@ public partial class AnonymousCreatedRole_Context : JsonSerializerContext { }
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 [JsonSerializable(typeof(AnonymousCreatedUser))]
 public partial class AnonymousCreatedUser_Context : JsonSerializerContext { }
+
+[JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
+[JsonSerializable(typeof(ModelStateDictionary))]
+public partial class ModelStateDictionary_Context : JsonSerializerContext { }
