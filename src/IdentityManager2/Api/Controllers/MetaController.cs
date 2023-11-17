@@ -55,11 +55,11 @@ namespace IdentityManager2.Api.Controllers
                 links["createRole"] = new CreateRoleLink(Url, meta.RoleMetadata);
             }
 
-            return Json(new MetaResult
+            return Ok(new MetaResult
             {
                 Data = data,
                 Links = links
-            }, MetaResult_Context.Default.Options);
+            });
         }
     }
 }

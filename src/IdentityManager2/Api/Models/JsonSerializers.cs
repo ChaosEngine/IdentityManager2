@@ -79,3 +79,19 @@ public partial class AnonymousCreatedUser_Context : JsonSerializerContext { }
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 [JsonSerializable(typeof(ModelStateDictionary))]
 public partial class ModelStateDictionary_Context : JsonSerializerContext { }
+
+
+[JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
+[JsonSerializable(typeof(ErrorModel))]
+public partial class ErrorModel_Context : JsonSerializerContext { }
+
+[JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
+[JsonSerializable(typeof(List<string>))]
+public partial class ListStringErrors_Context : JsonSerializerContext { }
+
+
+
+
+[JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
+[JsonSerializable(typeof(Microsoft.AspNetCore.Mvc.SerializableError))]
+public partial class SerializableError_Context : JsonSerializerContext { }

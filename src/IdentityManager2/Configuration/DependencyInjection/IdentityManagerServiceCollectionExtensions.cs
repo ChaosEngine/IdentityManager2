@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using IdentityManager2;
 using IdentityManager2.Configuration;
@@ -23,6 +24,18 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 options.JsonSerializerOptions.TypeInfoResolverChain.Add(ArrayPropertyValue_Context.Default);
                 options.JsonSerializerOptions.TypeInfoResolverChain.Add(ClaimValue_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(UserQueryResultResource_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(ErrorModel_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(MetaResult_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(UserDetailResource_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(ListStringErrors_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(ModelStateDictionary_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(AnonymousCreatedUser_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(MetaResult_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(RoleQueryResultResource_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(AnonymousCreatedRole_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(RoleDetailResource_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(SerializableError_Context.Default);
             });
 
             if (!string.IsNullOrEmpty(identityManagerOptions.SecurityConfiguration.AuthenticationScheme))

@@ -10,7 +10,6 @@ using IdentityManager2.Extensions;
 using IdentityManager2.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static System.String;
 
 namespace IdentityManager2.Api.Controllers
@@ -27,7 +26,7 @@ namespace IdentityManager2.Api.Controllers
         {
             this.service = service ?? throw new ArgumentNullException(nameof(service));
         }
-        
+
         public async Task<IdentityManagerMetadata> GetMetadataAsync()
         {
             if (metadata == null)
@@ -49,7 +48,7 @@ namespace IdentityManager2.Api.Controllers
                 var meta = await GetMetadataAsync();
 
                 var resource = new UserQueryResultResource(result.Result, Url, meta.UserMetadata);
-                return Json(resource, UserQueryResultResource_Context.Default.Options);
+                return Ok(resource);
             }
 
             return BadRequest(result.ToError());
@@ -76,19 +75,19 @@ namespace IdentityManager2.Api.Controllers
                 var result = await service.CreateUserAsync(properties);
                 if (result.IsSuccess)
                 {
-                    var url = Url.Link(IdentityManagerConstants.RouteNames.GetUser, new AnonymousSubject {subject = result.Result.Subject});
+                    var url = Url.Link(IdentityManagerConstants.RouteNames.GetUser, new AnonymousSubject { subject = result.Result.Subject });
                     var resource = new AnonymousCreatedUser
                     {
-                        Data = new AnonymousSubject {subject = result.Result.Subject},
-                        Links = new AnonymousDetail {detail = url}
+                        Data = new AnonymousSubject { subject = result.Result.Subject },
+                        Links = new AnonymousDetail { detail = url }
                     };
 
-                    return Created(url, JsonSerializer.Serialize(resource, AnonymousCreatedUser_Context.Default.AnonymousCreatedUser));
+                    return Created(url, resource);
                 }
 
                 ModelState.AddModelError("errors", result.Errors.Aggregate((workingSentence, next) => workingSentence + " " + next));
-                if(result.Errors.Count > 0)
-                    return BadRequest(JsonSerializer.Serialize(ModelState, ModelStateDictionary_Context.Default.ModelStateDictionary));
+                if (result.Errors.Count > 0)
+                    return BadRequest(ModelState);
             }
 
             return BadRequest(400);
@@ -99,7 +98,7 @@ namespace IdentityManager2.Api.Controllers
         {
             if (IsNullOrWhiteSpace(subject))
             {
-                ModelState["subject.String"].Errors.Clear();
+                ModelState["subject.String"]?.Errors.Clear();
                 ModelState.AddModelError("", Messages.SubjectRequired);
             }
 
@@ -129,7 +128,7 @@ namespace IdentityManager2.Api.Controllers
                     roles = roleResult.Result.Items.ToArray();
                 }
 
-                return Json(new UserDetailResource(result.Result, Url, meta, roles), UserDetailResource_Context.Default.Options);
+                return Ok(new UserDetailResource(result.Result, Url, meta, roles));
             }
 
             return BadRequest(result.ToError());
@@ -146,7 +145,7 @@ namespace IdentityManager2.Api.Controllers
 
             if (IsNullOrWhiteSpace(subject))
             {
-                ModelState["subject.String"].Errors.Clear();
+                ModelState["subject.String"]?.Errors.Clear();
                 ModelState.AddModelError("", Messages.SubjectRequired);
             }
 
@@ -169,7 +168,7 @@ namespace IdentityManager2.Api.Controllers
         {
             if (IsNullOrWhiteSpace(subject))
             {
-                ModelState["subject.String"].Errors.Clear();
+                ModelState["subject.String"]?.Errors.Clear();
                 ModelState.AddModelError("", Messages.SubjectRequired);
             }
 
@@ -205,7 +204,7 @@ namespace IdentityManager2.Api.Controllers
 
             if (IsNullOrWhiteSpace(subject))
             {
-                ModelState["subject.String"].Errors.Clear();
+                ModelState["subject.String"]?.Errors.Clear();
                 ModelState.AddModelError("", Messages.SubjectRequired);
             }
 
@@ -225,7 +224,7 @@ namespace IdentityManager2.Api.Controllers
 
                 ModelState.AddErrors(result);
             }
-            
+
             return BadRequest(ModelState.ToError());
         }
 
