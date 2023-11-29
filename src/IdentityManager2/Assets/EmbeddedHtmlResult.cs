@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using IdentityManager2.Api.Models;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityManager2.Assets
 {
+    [RequiresUnreferencedCode("Calls System.ComponentModel.TypeDescriptor.GetProperties(Object)")]
     internal class EmbeddedHtmlResult : IActionResult
     {
         private readonly string path;
