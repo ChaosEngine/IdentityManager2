@@ -14,8 +14,8 @@
     <PackageLicenseUrl>https://github.com/IdentityManager/IdentityManager2/blob/master/LICENSE</PackageLicenseUrl>
     <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
     <PublishTrimmed>true</PublishTrimmed>
-		<TrimMode>full</TrimMode>
-	</PropertyGroup>
+    <TrimMode>partial</TrimMode>
+  </PropertyGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Assets\Content\favicon.ico" />
