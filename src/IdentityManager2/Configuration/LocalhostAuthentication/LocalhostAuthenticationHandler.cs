@@ -11,8 +11,8 @@ namespace IdentityManager2.Configuration.Hosting
 {
     internal class LocalhostAuthenticationHandler : AuthenticationHandler<LocalhostAuthenticationOptions>, IAuthenticationSignOutHandler
     {
-        public LocalhostAuthenticationHandler(IOptionsMonitor<LocalhostAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) 
-            : base(options, logger, encoder, clock)
+        public LocalhostAuthenticationHandler(IOptionsMonitor<LocalhostAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder) 
+            : base(options, logger, encoder)
         {
         }
 

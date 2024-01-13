@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
 
@@ -29,19 +30,21 @@ namespace IdentityManager2.Assets
         internal static string LoadResourceString(string name, IDictionary<string, object> values)
         {
             var value = LoadResourceString(name);
-            foreach(var key in values.Keys)
+            foreach (var kv in values)
             {
-                var val = values[key];
-                value = value.Replace("{" + key + "}",  val != null ? val.ToString() : "");
+                var val = kv.Value;
+                value = value.Replace("{" + kv.Key + "}", val != null ? val.ToString() : "");
             }
             return value;
         }
         
+        [RequiresUnreferencedCode("Calls System.ComponentModel.TypeDescriptor.GetProperties(Object)")]
         internal static string LoadResourceString(string name, object values)
         {
             return LoadResourceString(name, Map(values));
         }
 
+        [RequiresUnreferencedCode("Calls System.ComponentModel.TypeDescriptor.GetProperties(Object)")]
         private static IDictionary<string, object> Map(object values)
         {
             var dictionary = values as IDictionary<string, object>;

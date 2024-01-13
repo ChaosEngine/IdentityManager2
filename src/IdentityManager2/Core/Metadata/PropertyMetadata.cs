@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -101,6 +102,7 @@ namespace IdentityManager2.Core.Metadata
             return FromPropertyInfo(property, name, displayName, dataType, required);
         }
 
+        [RequiresUnreferencedCode("Uses type.GetProperties")]
         public static PropertyMetadata FromPropertyName<T>(
             string propertyName,
             string name = null,
@@ -142,16 +144,19 @@ namespace IdentityManager2.Core.Metadata
             };
         }
 
+        [RequiresUnreferencedCode("Uses type.GetProperties")]
         public static IEnumerable<PropertyMetadata> FromType<T>()
         {
             return FromType(typeof(T), new string[0]);
         }
 
+        [RequiresUnreferencedCode("Uses type.GetProperties")]
         public static IEnumerable<PropertyMetadata> FromType<T>(params string[] propertiesToExclude)
         {
             return FromType(typeof(T), propertiesToExclude);
         }
 
+        [RequiresUnreferencedCode("Uses type.GetProperties")]
         public static IEnumerable<PropertyMetadata> FromType<T>(params Expression<Func<T, object>>[] propertyExpressionsToExclude)
         {
             var propertiesToExclude = new List<string>();
@@ -175,6 +180,7 @@ namespace IdentityManager2.Core.Metadata
             return FromType(typeof(T), propertiesToExclude.ToArray());
         }
 
+        [RequiresUnreferencedCode("Uses type.GetProperties")]
         public static IEnumerable<PropertyMetadata> FromType(Type type, params string[] propertiesToExclude)
         {
             if (type == null) throw new ArgumentNullException("PropertyMetadata::FromType::type is unassigned");

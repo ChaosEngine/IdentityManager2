@@ -44,11 +44,11 @@ namespace IdentityManager2.Api.Models
             {
                 var links = new Dictionary<string, string>
                 {
-                    {"detail", url.Link(IdentityManagerConstants.RouteNames.GetUser, new {subject = user.Data.Subject})}
+                    {"detail", url.Link(IdentityManagerConstants.RouteNames.GetUser, new AnonymousSubject { subject = user.Data.Subject})}
                 };
                 if (meta.SupportsDelete)
                 {
-                    links.Add("delete", url.Link(IdentityManagerConstants.RouteNames.DeleteUser, new {subject = user.Data.Subject}));
+                    links.Add("delete", url.Link(IdentityManagerConstants.RouteNames.DeleteUser, new AnonymousSubject { subject = user.Data.Subject}));
                 }
 
                 user.Links = links;

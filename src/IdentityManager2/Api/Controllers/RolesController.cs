@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using IdentityManager2.Api.Models;
 using IdentityManager2.Core;
@@ -15,7 +16,7 @@ namespace IdentityManager2.Api.Controllers
 {
     [Route(IdentityManagerConstants.RoleRoutePrefix)]
     [Authorize(IdentityManagerConstants.IdMgrAuthPolicy)]
-    [ResponseCache(NoStore=true, Location=ResponseCacheLocation.None)]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public class RolesController : Controller
     {
         private readonly IIdentityManagerService service;
@@ -67,7 +68,7 @@ namespace IdentityManager2.Api.Controllers
 
         // POST 
         [HttpPost, Route("", Name = IdentityManagerConstants.RouteNames.CreateRole)]
-        public async Task<IActionResult> CreateRoleAsync([FromBody]PropertyValue[] properties)
+        public async Task<IActionResult> CreateRoleAsync([FromBody] PropertyValue[] properties)
         {
             var meta = await GetMetadataAsync();
             if (!meta.RoleMetadata.SupportsCreate)
@@ -87,12 +88,12 @@ namespace IdentityManager2.Api.Controllers
                 var result = await service.CreateRoleAsync(properties);
                 if (result.IsSuccess)
                 {
-                    var url = Url.Link(IdentityManagerConstants.RouteNames.GetRole, new { subject = result.Result.Subject });
+                    var url = Url.Link(IdentityManagerConstants.RouteNames.GetRole, new AnonymousSubject { subject = result.Result.Subject });
 
-                    var resource = new
+                    var resource = new AnonymousCreatedRole
                     {
-                        Data = new { subject = result.Result.Subject },
-                        Links = new { detail = url }
+                        Data = new AnonymousSubject { subject = result.Result.Subject },
+                        Links = new AnonymousDetail { detail = url }
                     };
                     return Created(url, resource);
                 }
@@ -108,7 +109,7 @@ namespace IdentityManager2.Api.Controllers
         {
             if (IsNullOrWhiteSpace(subject))
             {
-                ModelState["subject.String"].Errors.Clear();
+                ModelState["subject.String"]?.Errors.Clear();
                 ModelState.AddModelError("", Messages.SubjectRequired);
             }
 
@@ -133,8 +134,6 @@ namespace IdentityManager2.Api.Controllers
                 }
 
                 var response = Ok(new RoleDetailResource(result.Result, Url, meta.RoleMetadata));
-
-
                 return response;
             }
             return BadRequest(result.ToError());
@@ -168,7 +167,7 @@ namespace IdentityManager2.Api.Controllers
         {
             if (IsNullOrWhiteSpace(subject))
             {
-                ModelState["subject.String"].Errors.Clear();
+                ModelState["subject.String"]?.Errors.Clear();
                 ModelState.AddModelError("", Messages.SubjectRequired);
             }
 

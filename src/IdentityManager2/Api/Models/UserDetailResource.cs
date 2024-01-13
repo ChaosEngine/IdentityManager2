@@ -24,7 +24,7 @@ namespace IdentityManager2.Api.Models
             var links = new Dictionary<string, string>();
             if (idmMeta.UserMetadata.SupportsDelete)
             {
-                links["delete"] = url.Link(IdentityManagerConstants.RouteNames.DeleteUser, new { subject = user.Subject });
+                links["delete"] = url.Link(IdentityManagerConstants.RouteNames.DeleteUser, new AnonymousSubject { subject = user.Subject });
             }
             Links = links;
         }
@@ -49,11 +49,11 @@ namespace IdentityManager2.Api.Models
                     from p in user.Properties
                     let m = (from m in meta.UserMetadata.UpdateProperties where m.Type == p.Type select m).SingleOrDefault()
                     where m != null
-                    select new
+                    select new AnonymousPropertiesDataMetaLink
                     {
                         Data = m.Convert(p.Value),
                         Meta = m,
-                        Links = new
+                        Links = new AnonymousUpdate
                         {
                             update = url.Link(IdentityManagerConstants.RouteNames.UpdateUserProperty,
                                 new
@@ -77,18 +77,18 @@ namespace IdentityManager2.Api.Models
                 var query =
                     from r in roles
                     orderby r.Name
-                    select new
+                    select new AnonymousRolesDataMetaLink
                     {
                         data = roleClaims.Any(x => x.Value == r.Name),
-                        meta = new
+                        meta = new AnonymousTypeDescription
                         {
                             type = r.Name,
                             description = r.Description,
                         },
-                        links = new
+                        links = new AnonymousRolesActionLinks
                         {
-                            add = url.Link(IdentityManagerConstants.RouteNames.AddRole, new { subject = user.Subject, role = r.Name.ToBase64UrlEncoded() }),
-                            remove = url.Link(IdentityManagerConstants.RouteNames.RemoveRole, new { subject = user.Subject, role = r.Name.ToBase64UrlEncoded() })
+                            add = url.Link(IdentityManagerConstants.RouteNames.AddRole, new AnonymousSubjectRole { subject = user.Subject, role = r.Name.ToBase64UrlEncoded() }),
+                            remove = url.Link(IdentityManagerConstants.RouteNames.RemoveRole, new AnonymousSubjectRole { subject = user.Subject, role = r.Name.ToBase64UrlEncoded() })
                         }
                     };
                 this["roles"] = query.ToArray();
@@ -98,10 +98,10 @@ namespace IdentityManager2.Api.Models
             {
                 var claims =
                     from c in user.Claims.ToArray()
-                    select new
+                    select new AnonymousClaimLinks
                     {
                         Data = c,
-                        Links = new
+                        Links = new AnonymousRolesDeleteLink
                         {
                             delete = url.Link(IdentityManagerConstants.RouteNames.RemoveClaim, new
                             {
@@ -112,16 +112,16 @@ namespace IdentityManager2.Api.Models
                         }
                     };
 
-                this["claims"] = new
+                this["claims"] = new AnonymousClaim
                 {
                     Data = claims.ToArray(),
-                    Links = new
+                    Links = new AnonymousCreateLink
                     {
-                        create = url.Link(IdentityManagerConstants.RouteNames.AddClaim, new { subject = user.Subject })
+                        create = url.Link(IdentityManagerConstants.RouteNames.AddClaim, new AnonymousSubject { subject = user.Subject })
                     }
                 };
             }
         }
     }
-   
+
 }

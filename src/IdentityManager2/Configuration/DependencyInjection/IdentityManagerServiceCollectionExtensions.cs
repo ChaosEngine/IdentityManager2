@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using IdentityManager2;
 using IdentityManager2.Configuration;
@@ -9,6 +11,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class IdentityManagerServiceCollectionExtensions
     {
+        [RequiresUnreferencedCode("Contains trimming unsafe calls")]
         public static IIdentityManagerBuilder AddIdentityManager(this IServiceCollection services, Action<IdentityManagerOptions> optionsAction = null)
         {
             services.Configure(optionsAction ?? (options => { }));
@@ -16,7 +19,24 @@ namespace Microsoft.Extensions.DependencyInjection
             var identityManagerOptions = services.BuildServiceProvider().GetRequiredService<IOptions<IdentityManagerOptions>>().Value;
             identityManagerOptions.Validate();
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+            .AddJsonOptions(static options =>
+            {
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(ArrayPropertyValue_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(ClaimValue_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(UserQueryResultResource_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(ErrorModel_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(MetaResult_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(UserDetailResource_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(ListStringErrors_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(ModelStateDictionary_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(AnonymousCreatedUser_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(MetaResult_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(RoleQueryResultResource_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(AnonymousCreatedRole_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(RoleDetailResource_Context.Default);
+                options.JsonSerializerOptions.TypeInfoResolverChain.Add(SerializableError_Context.Default);
+            });
 
             if (!string.IsNullOrEmpty(identityManagerOptions.SecurityConfiguration.AuthenticationScheme))
             {
@@ -72,6 +92,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return new IdentityManagerBuilder(services);
         }
 
+        [RequiresUnreferencedCode("Contains trimming unsafe calls")]
         public static IIdentityManagerBuilder AddIdentityMangerService<T>(this IIdentityManagerBuilder builder)
             where T : class, IIdentityManagerService
         {

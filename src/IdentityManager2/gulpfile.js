@@ -1,5 +1,5 @@
 ﻿var gulp = require("gulp"),
-    fs = require("fs"),
+    //fs = require("fs"),
     concat = require("gulp-concat"),
     less = require("gulp-less"),
     cleanCSS = require('gulp-clean-css');
@@ -16,7 +16,7 @@ gulp.task("css", function () {
 
 gulp.task("js", function () {
     return gulp.src([
-            'Assets/Scripts/Libs/jquery-2.1.0.min.js',
+            'Assets/Scripts/Libs/jquery.min.js',
             'Assets/Scripts/Libs/bootstrap.min.js',
             'Assets/Scripts/Libs/angular.min.js',
             'Assets/Scripts/Libs/angular-route.min.js',

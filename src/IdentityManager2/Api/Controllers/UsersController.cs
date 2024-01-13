@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using IdentityManager2.Api.Models;
 using IdentityManager2.Core;
@@ -25,7 +26,7 @@ namespace IdentityManager2.Api.Controllers
         {
             this.service = service ?? throw new ArgumentNullException(nameof(service));
         }
-        
+
         public async Task<IdentityManagerMetadata> GetMetadataAsync()
         {
             if (metadata == null)
@@ -74,18 +75,18 @@ namespace IdentityManager2.Api.Controllers
                 var result = await service.CreateUserAsync(properties);
                 if (result.IsSuccess)
                 {
-                    var url = Url.Link(IdentityManagerConstants.RouteNames.GetUser, new {subject = result.Result.Subject});
-                    var resource = new
+                    var url = Url.Link(IdentityManagerConstants.RouteNames.GetUser, new AnonymousSubject { subject = result.Result.Subject });
+                    var resource = new AnonymousCreatedUser
                     {
-                        Data = new {subject = result.Result.Subject},
-                        Links = new {detail = url}
+                        Data = new AnonymousSubject { subject = result.Result.Subject },
+                        Links = new AnonymousDetail { detail = url }
                     };
 
                     return Created(url, resource);
                 }
 
                 ModelState.AddModelError("errors", result.Errors.Aggregate((workingSentence, next) => workingSentence + " " + next));
-                if(result.Errors.Count > 0)
+                if (result.Errors.Count > 0)
                     return BadRequest(ModelState);
             }
 
@@ -97,7 +98,7 @@ namespace IdentityManager2.Api.Controllers
         {
             if (IsNullOrWhiteSpace(subject))
             {
-                ModelState["subject.String"].Errors.Clear();
+                ModelState["subject.String"]?.Errors.Clear();
                 ModelState.AddModelError("", Messages.SubjectRequired);
             }
 
@@ -144,7 +145,7 @@ namespace IdentityManager2.Api.Controllers
 
             if (IsNullOrWhiteSpace(subject))
             {
-                ModelState["subject.String"].Errors.Clear();
+                ModelState["subject.String"]?.Errors.Clear();
                 ModelState.AddModelError("", Messages.SubjectRequired);
             }
 
@@ -167,7 +168,7 @@ namespace IdentityManager2.Api.Controllers
         {
             if (IsNullOrWhiteSpace(subject))
             {
-                ModelState["subject.String"].Errors.Clear();
+                ModelState["subject.String"]?.Errors.Clear();
                 ModelState.AddModelError("", Messages.SubjectRequired);
             }
 
@@ -203,7 +204,7 @@ namespace IdentityManager2.Api.Controllers
 
             if (IsNullOrWhiteSpace(subject))
             {
-                ModelState["subject.String"].Errors.Clear();
+                ModelState["subject.String"]?.Errors.Clear();
                 ModelState.AddModelError("", Messages.SubjectRequired);
             }
 
@@ -223,7 +224,7 @@ namespace IdentityManager2.Api.Controllers
 
                 ModelState.AddErrors(result);
             }
-            
+
             return BadRequest(ModelState.ToError());
         }
 
