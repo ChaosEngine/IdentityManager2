@@ -1,4 +1,5 @@
-﻿/// <reference path="../Libs/angular.min.js" />
+﻿/*global angular*/
+/// <reference path="../Libs/angular.min.js" />
 /// <reference path="../Libs/angular-route.min.js" />
 
 (function (angular) {
@@ -117,7 +118,7 @@
                     }
 
                 }, feedback.errorHandler);
-        };
+        }
         loadUser();
 
         $scope.setProperty = function (property) {

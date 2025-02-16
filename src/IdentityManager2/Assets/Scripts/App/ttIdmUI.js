@@ -1,4 +1,5 @@
-﻿/// <reference path="../Libs/angular.min.js" />
+﻿/*global angular*/
+/// <reference path="../Libs/angular.min.js" />
 /// <reference path="../Libs/angular-route.min.js" />
 
 (function (angular) {
@@ -68,7 +69,7 @@
                     });
                 });
             }
-        }
+        };
     }
     ttFocus.$inject = [];
     app.directive("ttFocus", ttFocus);
@@ -95,11 +96,11 @@
                         scope.$apply(check);
                     });
                 });
-                scope.$watch(attrs.ttMatch, function (val) {
+                scope.$watch(attrs.ttMatch, function (/* val */) {
                     check();
                 });
             }
-        }
+        };
     }
     ttMatch.$inject = ["$timeout"];
     app.directive("ttMatch", ttMatch);
@@ -113,7 +114,7 @@
                 property: '=',
                 setProperty: '=setProperty'
             },
-            link: function (scope, elem, attrs, ctrl) {
+            link: function (/* scope, elem, attrs, ctrl */) {
             }
         };
     }
@@ -130,13 +131,13 @@
                 id: '@',
                 action: '@'
             },
-            link: function (scope, elem, attrs, ctrl) {
+            link: function (scope, elem/* , attrs, ctrl */) {
                 elem.id = scope.id.trim();
                 elem.find(".btn-primary.confirm").on("click", function () {
                     elem.trigger("confirm");
                 });
             }
-        }
+        };
     }
     ttPrompt.$inject = ["PathBase"];
     app.directive("ttPrompt", ttPrompt);
@@ -149,7 +150,7 @@
                 pager: '=',
                 path: "@"
             }
-        }
+        };
     }
     ttPagerButtons.$inject = ["PathBase"];
     app.directive("ttPagerButtons", ttPagerButtons);
@@ -161,7 +162,7 @@
             scope: {
                 pager: '='
             }
-        }
+        };
     }
     ttPagerSummary.$inject = ["PathBase"];
     app.directive("ttPagerSummary", ttPagerSummary);
@@ -242,7 +243,7 @@
                     }
                 });
             }
-        }
+        };
     }
     ttConfirmClick.$inject = [];
     app.directive("ttConfirmClick", ttConfirmClick);
@@ -254,7 +255,7 @@
                 model: "=message"
             },
             templateUrl: PathBase + '/assets/Templates.message.html',
-            link: function (scope, elem, attrs) {
+            link: function (scope/* , elem, attrs */) {
                 scope.$watch("model.message", function(){
                     scope.message = scope.model.message;
                 });
@@ -274,7 +275,7 @@
                     e.preventDefault();
                 });
             }
-        }
+        };
     }
     idmPreventDefault.$inject = [];
     app.directive("idmPreventDefault", idmPreventDefault);

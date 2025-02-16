@@ -275,6 +275,7 @@ e,u,b)})}function k(){var a,b;c.forEach(g,function(d,g){var q;if(q=!b){var h=f.p
 g=f[1];d.push(b[g]);d.push(f[2]||"");delete b[g]}});return d.join("")}var w=!1,n,v,s={routes:g,reload:function(){w=!0;a.$evalAsync(function(){l();m()})},updateParams:function(a){if(this.current&&this.current.$$route)a=c.extend({},this.current.params,a),f.path(t(this.current.$$route.originalPath,a)),f.search(a);else throw B("norout");}};a.$on("$locationChangeStart",l);a.$on("$locationChangeSuccess",m);return s}]});var B=c.$$minErr("ngRoute");p.provider("$routeParams",function(){this.$get=function(){return{}}});
 p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScroll","$animate"];A.$inject=["$compile","$controller","$route"]})(window,window.angular);
 
+/*global angular*/
 /// <reference path="../Libs/angular.min.js" />
 
 (function (angular) {
@@ -541,6 +542,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
     }
 })(angular);
 
+/*global angular*/
 /// <reference path="../Libs/angular.min.js" />
 /// <reference path="../Libs/angular-route.min.js" />
 
@@ -611,7 +613,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
                     });
                 });
             }
-        }
+        };
     }
     ttFocus.$inject = [];
     app.directive("ttFocus", ttFocus);
@@ -638,11 +640,11 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
                         scope.$apply(check);
                     });
                 });
-                scope.$watch(attrs.ttMatch, function (val) {
+                scope.$watch(attrs.ttMatch, function (/* val */) {
                     check();
                 });
             }
-        }
+        };
     }
     ttMatch.$inject = ["$timeout"];
     app.directive("ttMatch", ttMatch);
@@ -656,7 +658,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
                 property: '=',
                 setProperty: '=setProperty'
             },
-            link: function (scope, elem, attrs, ctrl) {
+            link: function (/* scope, elem, attrs, ctrl */) {
             }
         };
     }
@@ -673,13 +675,13 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
                 id: '@',
                 action: '@'
             },
-            link: function (scope, elem, attrs, ctrl) {
+            link: function (scope, elem/* , attrs, ctrl */) {
                 elem.id = scope.id.trim();
                 elem.find(".btn-primary.confirm").on("click", function () {
                     elem.trigger("confirm");
                 });
             }
-        }
+        };
     }
     ttPrompt.$inject = ["PathBase"];
     app.directive("ttPrompt", ttPrompt);
@@ -692,7 +694,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
                 pager: '=',
                 path: "@"
             }
-        }
+        };
     }
     ttPagerButtons.$inject = ["PathBase"];
     app.directive("ttPagerButtons", ttPagerButtons);
@@ -704,7 +706,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
             scope: {
                 pager: '='
             }
-        }
+        };
     }
     ttPagerSummary.$inject = ["PathBase"];
     app.directive("ttPagerSummary", ttPagerSummary);
@@ -785,7 +787,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
                     }
                 });
             }
-        }
+        };
     }
     ttConfirmClick.$inject = [];
     app.directive("ttConfirmClick", ttConfirmClick);
@@ -797,7 +799,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
                 model: "=message"
             },
             templateUrl: PathBase + '/assets/Templates.message.html',
-            link: function (scope, elem, attrs) {
+            link: function (scope/* , elem, attrs */) {
                 scope.$watch("model.message", function(){
                     scope.message = scope.model.message;
                 });
@@ -817,12 +819,13 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
                     e.preventDefault();
                 });
             }
-        }
+        };
     }
     idmPreventDefault.$inject = [];
     app.directive("idmPreventDefault", idmPreventDefault);
 })(angular);
 
+/*global angular*/
 /// <reference path="../Libs/angular.min.js" />
 /// <reference path="../Libs/angular-route.min.js" />
 
@@ -942,7 +945,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
                     }
 
                 }, feedback.errorHandler);
-        };
+        }
         loadUser();
 
         $scope.setProperty = function (property) {
@@ -1006,6 +1009,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
 
 })(angular);
 
+/*global angular*/
 /// <reference path="../Libs/angular.min.js" />
 /// <reference path="../Libs/angular-route.min.js" />
 
@@ -1119,7 +1123,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
                         $scope.tab = 1;
                     }
                 }, feedback.errorHandler);
-        };
+        }
         loadRole();
 
         $scope.setProperty = function (property) {
@@ -1148,6 +1152,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
 
 })(angular);
 
+/*global angular*/
 /// <reference path="../Libs/angular.min.js" />
 /// <reference path="../Libs/angular-route.min.js" />
 

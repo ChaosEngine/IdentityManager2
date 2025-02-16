@@ -1,4 +1,5 @@
-﻿/// <reference path="../Libs/angular.min.js" />
+﻿/*global angular*/
+/// <reference path="../Libs/angular.min.js" />
 
 (function (angular) {
     const app = angular.module("ttIdm", []);
