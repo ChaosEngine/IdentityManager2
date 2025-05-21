@@ -9,16 +9,16 @@ importers:
   .:
     devDependencies:
       gulp:
-        specifier: 5.0.0
+        specifier: ^5.0.0
         version: 5.0.0
       gulp-clean-css:
-        specifier: 4.3.0
+        specifier: ^4.3.0
         version: 4.3.0
       gulp-concat:
-        specifier: 2.6.1
+        specifier: ^2.6.1
         version: 2.6.1
       gulp-less:
-        specifier: 5.0.0
+        specifier: ^5.0.0
         version: 5.0.0
 
 packages:
