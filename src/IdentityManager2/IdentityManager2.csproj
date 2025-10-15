@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <Description>IdentityManager is an user management tool for ASP.NET Core. Maintained by Rock Solid Knowledge.</Description>
-    <VersionPrefix>1.0.1</VersionPrefix>
+    <VersionPrefix>1.0.2</VersionPrefix>
     <Authors>Scott Brady</Authors>
     <AssemblyName>IdentityManager2</AssemblyName>
     <PackageId>IdentityManager2</PackageId>
