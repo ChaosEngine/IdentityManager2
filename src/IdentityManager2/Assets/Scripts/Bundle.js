@@ -282,7 +282,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
     const app = angular.module("ttIdm", []);
     
     function config($httpProvider) {
-        function intercept($q, $injector, idmErrorService, PathBase, $rootScope) {
+        function intercept($q, $injector, idmErrorService, PathBase, ApiPathBase, $rootScope) {
             var inprogressRefreshRequest = null;
 
             return {
@@ -335,7 +335,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
             };
         }
 
-        intercept.$inject = ["$q", "$injector", "idmErrorService", "PathBase", "$rootScope"];
+        intercept.$inject = ["$q", "$injector", "idmErrorService", "PathBase", "ApiPathBase", "$rootScope"];
         $httpProvider.interceptors.push(intercept);
     }
     config.$inject = ["$httpProvider"];
@@ -364,7 +364,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
     idmErrorService.$inject = ["$rootScope", "$timeout"];
     app.factory("idmErrorService", idmErrorService);
 
-    function idmApi($http, $q, PathBase) {
+    function idmApi($http, $q, ApiPathBase, ApiPathBase) {
         var cache = null;
 
         return {
@@ -375,7 +375,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
                     return d.promise;
                 }
 
-                return $http.get(PathBase + "/api").then(function(resp) {
+                return $http.get(ApiPathBase + "/api").then(function(resp) {
                         cache = resp.data;
                         return cache;
                     },
@@ -392,7 +392,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
         };
     }
 
-    idmApi.$inject = ["$http", "$q", "PathBase"];
+    idmApi.$inject = ["$http", "$q", "PathBase", "ApiPathBase"];
     app.factory("idmApi", idmApi);
 
     function idmUsers($http, idmApi, $log) {
@@ -662,7 +662,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
             }
         };
     }
-    ttPropertyEditor.$inject = ["PathBase"];
+    ttPropertyEditor.$inject = ["PathBase", "ApiPathBase"];
     app.directive("ttPropertyEditor", ttPropertyEditor);
 
     function ttPrompt(PathBase) {
@@ -683,7 +683,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
             }
         };
     }
-    ttPrompt.$inject = ["PathBase"];
+    ttPrompt.$inject = ["PathBase", "ApiPathBase"];
     app.directive("ttPrompt", ttPrompt);
 
     function ttPagerButtons(PathBase) {
@@ -696,7 +696,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
             }
         };
     }
-    ttPagerButtons.$inject = ["PathBase"];
+    ttPagerButtons.$inject = ["PathBase", "ApiPathBase"];
     app.directive("ttPagerButtons", ttPagerButtons);
 
     function ttPagerSummary(PathBase) {
@@ -708,7 +708,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
             }
         };
     }
-    ttPagerSummary.$inject = ["PathBase"];
+    ttPagerSummary.$inject = ["PathBase", "ApiPathBase"];
     app.directive("ttPagerSummary", ttPagerSummary);
 
     function idmPager($sce) {
@@ -809,7 +809,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
             }
         };
     }
-    idmMessage.$inject = ["PathBase"];
+    idmMessage.$inject = ["PathBase", "ApiPathBase"];
     app.directive("idmMessage", idmMessage);
 
     function idmPreventDefault() {
@@ -854,7 +854,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
                 templateUrl: PathBase + '/assets/Templates.users.edit.html'
             });
     }
-    config.$inject = ["$routeProvider", "PathBase"];
+    config.$inject = ["$routeProvider", "PathBase", "ApiPathBase"];
     app.config(config);
 
     function ListUsersCtrl($scope, idmUsers, idmPager, $routeParams, $location) {
@@ -1038,7 +1038,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
                 templateUrl: PathBase + '/assets/Templates.roles.edit.html'
             });
     }
-    config.$inject = ["$routeProvider", "PathBase"];
+    config.$inject = ["$routeProvider", "PathBase", "ApiPathBase"];
     app.config(config);
 
     function ListRolesCtrl($scope, idmRoles, idmPager, $routeParams, $location) {
@@ -1158,7 +1158,7 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
 
 (function (angular) {
     const app = angular.module("ttIdmApp", ["ngRoute", "ttIdm", "ttIdmUI", "ttIdmUsers", "ttIdmRoles"]);
-    function config(PathBase, $routeProvider) {
+    function config(PathBase, ApiPathBase, $routeProvider) {
         $routeProvider
             .when("/", {
                 templateUrl: PathBase + "/assets/Templates.home.html"
@@ -1170,10 +1170,10 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
                 redirectTo: "/"
             });
     }
-    config.$inject = ["PathBase", "$routeProvider"];
+    config.$inject = ["PathBase", "ApiPathBase", "$routeProvider"];
     app.config(config);
 
-    function LayoutCtrl($rootScope, PathBase, idmApi, $location, $window, idmErrorService, ShowLoginButton,
+    function LayoutCtrl($rootScope, PathBase, ApiPathBase, idmApi, $location, $window, idmErrorService, ShowLoginButton,
         TitleNavBarLinkTarget, LoginPath, LogoutPath) {
         $rootScope.PathBase = PathBase;
         $rootScope.layout = {};
@@ -1207,16 +1207,16 @@ p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScro
         $rootScope.login = function () {
             idmErrorService.clear();
 
-            $window.location = PathBase + (LoginPath || "/api/login");
+            $window.location = ApiPathBase + (LoginPath || "/api/login");
         };
 
         $rootScope.logout = function() {
             idmErrorService.clear();
 
-            $window.location = PathBase + (LogoutPath || "/api/logout");
+            $window.location = ApiPathBase + (LogoutPath || "/api/logout");
         };
     }
-    LayoutCtrl.$inject = ["$rootScope", "PathBase", "idmApi", "$location", "$window", "idmErrorService", "ShowLoginButton",
+    LayoutCtrl.$inject = ["$rootScope", "PathBase", "ApiPathBase", "idmApi", "$location", "$window", "idmErrorService", "ShowLoginButton",
         "TitleNavBarLinkTarget", "LoginPath", "LogoutPath"];
     app.controller("LayoutCtrl", LayoutCtrl);
 })(angular);

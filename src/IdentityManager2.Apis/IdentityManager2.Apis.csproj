@@ -11,11 +11,22 @@
     <PackageIconUrl>https://identityserver.github.io/Documentation/assets/images/icons/IDmanager_icon144.jpg</PackageIconUrl>
     <PackageProjectUrl>https://github.com/IdentityManager/IdentityManager2</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/IdentityManager/IdentityManager2/blob/master/LICENSE</PackageLicenseUrl>
+    <!--
+    https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/aspnetcore-openapi?view=aspnetcore-9.0&tabs=visual-studio%2Cvisual-studio-code#generate-openapi-documents-at-build-time
+    -->
+    <OpenApiDocumentsDirectory>$(MSBuildProjectDirectory)</OpenApiDocumentsDirectory>
+    <OpenApiGenerateDocuments>true</OpenApiGenerateDocuments>
+    
     <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
   </PropertyGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.10" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.9.0" />
   </ItemGroup>
 
   <ItemGroup>

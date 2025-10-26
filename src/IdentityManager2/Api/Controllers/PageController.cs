@@ -30,9 +30,11 @@ namespace IdentityManager2.Api.Controllers
 
             return View("/Areas/IdentityManager/Pages/Index.cshtml", new PageModel
             {
+                ApiPathBase = Request.PathBase + Request.Path,
                 PathBase = Request.PathBase,
                 Model = JsonSerializer.Serialize(new PageModelParams
                 {
+                    ApiPathBase = Request.PathBase + Request.Path,
                     PathBase = Request.PathBase,
                     ShowLoginButton = !authResult.Succeeded,
                     TitleNavBarLinkTarget = this.config.TitleNavBarLinkTarget,
