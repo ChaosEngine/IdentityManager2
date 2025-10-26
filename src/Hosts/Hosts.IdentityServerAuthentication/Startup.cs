@@ -11,9 +11,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Hosts.IdentityServerAuthentication
 {
-    public class Startup
+    public static class Startup
     {
-        public void ConfigureServices(IServiceCollection services)
+        public static void ConfigureServices(this IServiceCollection services)
         {
             // In-memory IdentityManagerService (demo only)
             services.AddIdentityManager(opt =>
@@ -24,24 +24,25 @@ namespace Hosts.IdentityServerAuthentication
                             HostChallengeType = "oidc",
                             AdditionalSignOutType = "oidc"
                         })
-                .AddIdentityMangerService<InMemoryIdentityManagerService>();
+                .AddIdentityMangerService<InMemoryIdentityManagerService>()
+                .AddIdentityManagerUI();
 
             var rand = new Random();
             var identityManagerUsers = Users.Get(rand.Next(5000, 20000));
             services.AddSingleton(x => identityManagerUsers);
             services.AddSingleton(x => Roles.Get(rand.Next(15)));
-            
+
             var client = new Client
             {
                 ClientId = "identitymanager2",
                 ClientName = "IdentityManager2",
                 AllowedGrantTypes = GrantTypes.Implicit,
-                RedirectUris = {"https://localhost:5000/idm/signin-oidc"},
-                AllowedScopes = {"openid", "profile", "roles"},
+                RedirectUris = { "https://localhost:5000/idm/signin-oidc" },
+                AllowedScopes = { "openid", "profile", "roles" },
                 RequireConsent = false
             };
 
-            var roles = new IdentityResource("roles", new List<string> {"role"});
+            var roles = new IdentityResource("roles", new List<string> { "role" });
 
             var identityServerUsers = identityManagerUsers.Select(x => new TestUser
             {
@@ -57,9 +58,9 @@ namespace Hosts.IdentityServerAuthentication
                     options.UserInteraction.LogoutUrl = "/logout";
                 })
                 .AddTestUsers(identityServerUsers)
-                .AddInMemoryIdentityResources(new List<IdentityResource> {new IdentityResources.OpenId(), new IdentityResources.Profile(), roles})
+                .AddInMemoryIdentityResources(new List<IdentityResource> { new IdentityResources.OpenId(), new IdentityResources.Profile(), roles })
                 .AddInMemoryApiResources(new List<ApiResource>())
-                .AddInMemoryClients(new List<Client> {client})
+                .AddInMemoryClients(new List<Client> { client })
                 .AddDeveloperSigningCredential(false);
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -80,19 +81,21 @@ namespace Hosts.IdentityServerAuthentication
                 });
         }
 
-        public void Configure(IApplicationBuilder app)
+        public static void Configure(this WebApplication app)
         {
             app.UseDeveloperExceptionPage();
 
             app.Map("/auth", auth =>
             {
                 auth.UseRouting();
-                
+
                 auth.UseIdentityServer();
-                
+
                 auth.UseEndpoints(x => x.MapDefaultControllerRoute());
             });
-            
+
+            app.MapIdentityManagerUI("idm"); // set "launchUrl": "idm", in launchSettings.json
+
             app.Map("/idm", idm =>
             {
                 idm.UseRouting();
@@ -102,9 +105,11 @@ namespace Hosts.IdentityServerAuthentication
 
                 idm.UseIdentityManager();
 
-                idm.UseEndpoints(x => x.MapDefaultControllerRoute());
+                idm.UseEndpoints(x =>
+                {
+                    x.MapDefaultControllerRoute();
+                });
             });
-
         }
     }
 }

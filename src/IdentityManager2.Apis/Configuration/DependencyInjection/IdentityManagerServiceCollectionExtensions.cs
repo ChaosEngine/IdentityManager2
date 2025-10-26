@@ -21,7 +21,7 @@ public static class IdentityManagerServiceCollectionExtensions
         identityManagerOptions.Validate();
 
         services
-            .AddControllersWithViews()
+            .AddControllers()
             .AddJsonOptions(static options =>
             {
                 options.JsonSerializerOptions.TypeInfoResolverChain.Add(ArrayPropertyValue_Context.Default);

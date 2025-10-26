@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hosts.IdentityServerAuthentication
 {
+    [Route("login")]
     public class LoginController : Controller
     {
         private readonly ICollection<InMemoryUser> users;

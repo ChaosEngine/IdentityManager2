@@ -34,10 +34,6 @@ public static class IdentityManagerApplicationBuilderExtensions
 
         endpoints.MapIdentityManagerApis(pattern); // do not use endpointGroup here
 
-        endpointGroup.MapControllerRoute(
-            name: "idmgr2-page",
-            pattern: "{controller=page}/{action=index}/{id?}");
-
         return endpoints;
     }
 

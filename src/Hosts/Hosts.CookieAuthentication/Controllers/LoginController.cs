@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Hosts.CookieAuthentication
 {
+    [Route("login")]
     public class LoginController : Controller
     {
         private readonly ICollection<InMemoryUser> users;
@@ -19,13 +20,13 @@ namespace Hosts.CookieAuthentication
             this.users = users ?? throw new ArgumentNullException(nameof(users));
         }
 
-        [HttpGet("login")]
+        [HttpGet(Name = "CookieAuthentication-login")]
         public IActionResult Login(string returnUrl)
         {
             return View(new LoginModel {ReturnUrl = returnUrl});
         }
 
-        [HttpPost("login")]
+        [HttpPost("CookieAuthentication-login")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginModel model)
         {

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using System;
 using System.Text.Json;
@@ -27,14 +28,15 @@ namespace IdentityManager2.Api.Controllers
         public async Task<IActionResult> Index()
         {
             var authResult = await HttpContext.AuthenticateAsync(config.SecurityConfiguration.HostAuthenticationType);
+            var apiPathBase = Request.PathBase + (Request.Path == "/" ? PathString.Empty : Request.Path);
 
             return View("/Areas/IdentityManager/Pages/Index.cshtml", new PageModel
             {
-                ApiPathBase = Request.PathBase + Request.Path,
+                ApiPathBase = apiPathBase,
                 PathBase = Request.PathBase,
                 Model = JsonSerializer.Serialize(new PageModelParams
                 {
-                    ApiPathBase = Request.PathBase + Request.Path,
+                    ApiPathBase = apiPathBase,
                     PathBase = Request.PathBase,
                     ShowLoginButton = !authResult.Succeeded,
                     TitleNavBarLinkTarget = this.config.TitleNavBarLinkTarget,
@@ -47,6 +49,7 @@ namespace IdentityManager2.Api.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("api/login", Name = IdentityManagerConstants.RouteNames.Login)]
+        [EndpointName("api-login")]
         public async Task<IActionResult> Login()
         {
             var authResult = await HttpContext.AuthenticateAsync(config.SecurityConfiguration.HostAuthenticationType);
@@ -62,6 +65,7 @@ namespace IdentityManager2.Api.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("api/login/refresh")]
+        [EndpointName("api-refresh")]
         public async Task<IActionResult> Refresh()
         {
             var authResult = await HttpContext.AuthenticateAsync(config.SecurityConfiguration.HostAuthenticationType);
@@ -77,6 +81,7 @@ namespace IdentityManager2.Api.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("api/logout", Name = IdentityManagerConstants.RouteNames.Logout)]
+        [EndpointName("api-logout")]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(IdentityManagerConstants.LocalApiScheme);
