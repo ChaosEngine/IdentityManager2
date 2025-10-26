@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using IdentityManager2.Resources;
 
 namespace IdentityManager2.Core
 {

@@ -1,12 +1,13 @@
-﻿using System;
-using System.Text.Json;
-using System.Threading.Tasks;
-using IdentityManager2.Api.Models;
+﻿using IdentityManager2.Api.Models;
 using IdentityManager2.Configuration;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace IdentityManager2.Api.Controllers
 {
@@ -15,6 +16,7 @@ namespace IdentityManager2.Api.Controllers
     public class PageController : Controller
     {
         private readonly IdentityManagerOptions config;
+
         public PageController(IOptions<IdentityManagerOptions> config)
         {
             this.config = config?.Value ?? throw new ArgumentNullException(nameof(config));
@@ -52,7 +54,7 @@ namespace IdentityManager2.Api.Controllers
                 return RedirectToAction("Index");
             }
 
-            return Challenge(new AuthenticationProperties {RedirectUri = Url.Action("Login")}, config.SecurityConfiguration.HostChallengeType);
+            return Challenge(new AuthenticationProperties { RedirectUri = Url.Action("Login") }, config.SecurityConfiguration.HostChallengeType);
         }
 
         [HttpGet]
@@ -77,12 +79,21 @@ namespace IdentityManager2.Api.Controllers
         {
             await HttpContext.SignOutAsync(IdentityManagerConstants.LocalApiScheme);
 
-            await config.SecurityConfiguration.SignOut(HttpContext);
+            await this.SignOut(HttpContext);
 
             // if a signout scheme has started a redirect
             if (HttpContext.Response.StatusCode == 302) return StatusCode(302);
-            
+
             return RedirectToRoute(IdentityManagerConstants.RouteNames.Home, null);
+        }
+
+        [NonAction]
+        internal virtual async Task SignOut(HttpContext context)
+        {
+            await context.SignOutAsync(config.SecurityConfiguration.HostAuthenticationType);
+
+            if (!string.IsNullOrWhiteSpace(config.SecurityConfiguration.AdditionalSignOutType))
+                await context.SignOutAsync(config.SecurityConfiguration.AdditionalSignOutType);
         }
     }
 }

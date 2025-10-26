@@ -1,6 +1,5 @@
 ﻿using System;
 using IdentityManager2.Extensions;
-using IdentityManager2.Resources;
 
 namespace IdentityManager2.Core.Metadata
 {

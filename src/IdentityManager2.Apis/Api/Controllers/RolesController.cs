@@ -7,7 +7,6 @@ using IdentityManager2.Api.Models;
 using IdentityManager2.Core;
 using IdentityManager2.Core.Metadata;
 using IdentityManager2.Extensions;
-using IdentityManager2.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static System.String;

@@ -56,13 +56,5 @@ namespace IdentityManager2.Configuration
         public virtual void Configure(IServiceCollection services)
         {
         }
-
-        internal virtual async Task SignOut(HttpContext context)
-        {
-            await context.SignOutAsync(HostAuthenticationType);
-
-            if (!string.IsNullOrWhiteSpace(AdditionalSignOutType))
-                await context.SignOutAsync(AdditionalSignOutType);
-        }
     }
 }

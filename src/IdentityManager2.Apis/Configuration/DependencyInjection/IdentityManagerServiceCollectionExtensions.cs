@@ -19,24 +19,25 @@ namespace Microsoft.Extensions.DependencyInjection
             var identityManagerOptions = services.BuildServiceProvider().GetRequiredService<IOptions<IdentityManagerOptions>>().Value;
             identityManagerOptions.Validate();
 
-            services.AddControllersWithViews()
-            .AddJsonOptions(static options =>
-            {
-                options.JsonSerializerOptions.TypeInfoResolverChain.Add(ArrayPropertyValue_Context.Default);
-                options.JsonSerializerOptions.TypeInfoResolverChain.Add(ClaimValue_Context.Default);
-                options.JsonSerializerOptions.TypeInfoResolverChain.Add(UserQueryResultResource_Context.Default);
-                options.JsonSerializerOptions.TypeInfoResolverChain.Add(ErrorModel_Context.Default);
-                options.JsonSerializerOptions.TypeInfoResolverChain.Add(MetaResult_Context.Default);
-                options.JsonSerializerOptions.TypeInfoResolverChain.Add(UserDetailResource_Context.Default);
-                options.JsonSerializerOptions.TypeInfoResolverChain.Add(ListStringErrors_Context.Default);
-                options.JsonSerializerOptions.TypeInfoResolverChain.Add(ModelStateDictionary_Context.Default);
-                options.JsonSerializerOptions.TypeInfoResolverChain.Add(AnonymousCreatedUser_Context.Default);
-                options.JsonSerializerOptions.TypeInfoResolverChain.Add(MetaResult_Context.Default);
-                options.JsonSerializerOptions.TypeInfoResolverChain.Add(RoleQueryResultResource_Context.Default);
-                options.JsonSerializerOptions.TypeInfoResolverChain.Add(AnonymousCreatedRole_Context.Default);
-                options.JsonSerializerOptions.TypeInfoResolverChain.Add(RoleDetailResource_Context.Default);
-                options.JsonSerializerOptions.TypeInfoResolverChain.Add(SerializableError_Context.Default);
-            });
+            services
+                .AddControllersWithViews()
+                .AddJsonOptions(static options =>
+                {
+                    options.JsonSerializerOptions.TypeInfoResolverChain.Add(ArrayPropertyValue_Context.Default);
+                    options.JsonSerializerOptions.TypeInfoResolverChain.Add(ClaimValue_Context.Default);
+                    options.JsonSerializerOptions.TypeInfoResolverChain.Add(UserQueryResultResource_Context.Default);
+                    options.JsonSerializerOptions.TypeInfoResolverChain.Add(ErrorModel_Context.Default);
+                    options.JsonSerializerOptions.TypeInfoResolverChain.Add(MetaResult_Context.Default);
+                    options.JsonSerializerOptions.TypeInfoResolverChain.Add(UserDetailResource_Context.Default);
+                    options.JsonSerializerOptions.TypeInfoResolverChain.Add(ListStringErrors_Context.Default);
+                    options.JsonSerializerOptions.TypeInfoResolverChain.Add(ModelStateDictionary_Context.Default);
+                    options.JsonSerializerOptions.TypeInfoResolverChain.Add(AnonymousCreatedUser_Context.Default);
+                    options.JsonSerializerOptions.TypeInfoResolverChain.Add(MetaResult_Context.Default);
+                    options.JsonSerializerOptions.TypeInfoResolverChain.Add(RoleQueryResultResource_Context.Default);
+                    options.JsonSerializerOptions.TypeInfoResolverChain.Add(AnonymousCreatedRole_Context.Default);
+                    options.JsonSerializerOptions.TypeInfoResolverChain.Add(RoleDetailResource_Context.Default);
+                    options.JsonSerializerOptions.TypeInfoResolverChain.Add(SerializableError_Context.Default);
+                });
 
             if (!string.IsNullOrEmpty(identityManagerOptions.SecurityConfiguration.AuthenticationScheme))
             {
