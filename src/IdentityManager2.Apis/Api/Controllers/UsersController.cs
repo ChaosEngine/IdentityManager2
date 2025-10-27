@@ -2,7 +2,6 @@ using IdentityManager2.Api.Models;
 using IdentityManager2.Core;
 using IdentityManager2.Core.Metadata;
 using IdentityManager2.Extensions;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -14,36 +13,15 @@ using static System.String;
 
 namespace IdentityManager2.Api.Controllers
 {
-    [ApiController]
+    // TOOD: [Route("api/[area:exists]/[controller]")]
     [Route(IdentityManagerConstants.UserRoutePrefix)]
-    [Authorize(IdentityManagerConstants.IdMgrAuthPolicy)]
-    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
-    public class UsersController : ControllerBase
+    public class UsersController : BaseApiController
     {
-        private readonly IIdentityManagerService service;
-        private IdentityManagerMetadata metadata;
-
         #region Constructors
 
-        public UsersController(IIdentityManagerService service)
-        {
-            this.service = service ?? throw new ArgumentNullException(nameof(service));
-        }
+        public UsersController(IIdentityManagerService service) : base(service) { }
 
         #endregion
-
-        [NonAction]
-        public async Task<IdentityManagerMetadata> GetMetadataAsync()
-        {
-            if (metadata == null)
-            {
-                metadata = await service.GetMetadataAsync();
-                if (metadata == null) throw new InvalidOperationException("GetMetadataAsync returned null");
-                metadata.Validate();
-            }
-
-            return metadata;
-        }
 
         #region Endpoints
 
