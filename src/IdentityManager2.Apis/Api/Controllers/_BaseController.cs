@@ -1,6 +1,7 @@
 ﻿using IdentityManager2.Core.Metadata;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -19,14 +20,16 @@ public static class AreaApiConstants
 [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 public abstract class BaseApiController : ControllerBase
 {
+    protected readonly ILogger logger;
     protected readonly IIdentityManagerService service;
     protected IdentityManagerMetadata metadata;
 
     #region Constructors
 
-    protected BaseApiController(IIdentityManagerService service)
+    protected BaseApiController(IIdentityManagerService service, ILogger logger)
     {
         this.service = service ?? throw new ArgumentNullException(nameof(service));
+        this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     #endregion
