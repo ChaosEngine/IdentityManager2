@@ -6,7 +6,7 @@ using IdentityManager2;
 using IdentityManager2.Core;
 using IdentityManager2.Core.Metadata;
 using IdentityManager2.Extensions;
-using IdentityManager2.Resources;
+using IdentityManager2.Apis.Resources;
 
 namespace Hosts.Shared.InMemory
 {

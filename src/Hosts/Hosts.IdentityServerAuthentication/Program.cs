@@ -1,16 +1,18 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Builder;
 
-namespace Hosts.IdentityServerAuthentication
+namespace Hosts.IdentityServerAuthentication;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+        var builder = WebApplication.CreateBuilder(args);
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
+        Startup.ConfigureServices(builder.Services);
+
+        var app = builder.Build();
+        app.Configure();
+
+        app.Run();
     }
 }

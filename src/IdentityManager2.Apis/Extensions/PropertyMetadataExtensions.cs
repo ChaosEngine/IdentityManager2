@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using IdentityManager2.Core;
 using IdentityManager2.Core.Metadata;
-using IdentityManager2.Resources;
 using static System.Boolean;
 using static System.String;
 

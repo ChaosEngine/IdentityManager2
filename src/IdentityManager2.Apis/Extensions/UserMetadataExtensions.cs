@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using IdentityManager2.Core.Metadata;
-using IdentityManager2.Resources;
 
 namespace IdentityManager2.Extensions
 {

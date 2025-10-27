@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using IdentityManager2.Extensions;
-using IdentityManager2.Resources;
 
 namespace IdentityManager2.Core.Metadata
 {

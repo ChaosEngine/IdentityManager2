@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using IdentityManager2.Core.Metadata;
-using IdentityManager2.Resources;
 
 namespace IdentityManager2.Extensions
 {

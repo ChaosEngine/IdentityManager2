@@ -1,12 +1,14 @@
-﻿using System;
-using System.Text.Json;
-using System.Threading.Tasks;
-using IdentityManager2.Api.Models;
+﻿using IdentityManager2.Api.Models;
 using IdentityManager2.Configuration;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
+using System;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace IdentityManager2.Api.Controllers
 {
@@ -15,6 +17,7 @@ namespace IdentityManager2.Api.Controllers
     public class PageController : Controller
     {
         private readonly IdentityManagerOptions config;
+
         public PageController(IOptions<IdentityManagerOptions> config)
         {
             this.config = config?.Value ?? throw new ArgumentNullException(nameof(config));
@@ -25,12 +28,15 @@ namespace IdentityManager2.Api.Controllers
         public async Task<IActionResult> Index()
         {
             var authResult = await HttpContext.AuthenticateAsync(config.SecurityConfiguration.HostAuthenticationType);
+            var apiPathBase = Request.PathBase + (Request.Path == "/" ? PathString.Empty : Request.Path);
 
             return View("/Areas/IdentityManager/Pages/Index.cshtml", new PageModel
             {
+                ApiPathBase = apiPathBase,
                 PathBase = Request.PathBase,
                 Model = JsonSerializer.Serialize(new PageModelParams
                 {
+                    ApiPathBase = apiPathBase,
                     PathBase = Request.PathBase,
                     ShowLoginButton = !authResult.Succeeded,
                     TitleNavBarLinkTarget = this.config.TitleNavBarLinkTarget,
@@ -43,6 +49,7 @@ namespace IdentityManager2.Api.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("api/login", Name = IdentityManagerConstants.RouteNames.Login)]
+        [EndpointName("api-login")]
         public async Task<IActionResult> Login()
         {
             var authResult = await HttpContext.AuthenticateAsync(config.SecurityConfiguration.HostAuthenticationType);
@@ -52,12 +59,13 @@ namespace IdentityManager2.Api.Controllers
                 return RedirectToAction("Index");
             }
 
-            return Challenge(new AuthenticationProperties {RedirectUri = Url.Action("Login")}, config.SecurityConfiguration.HostChallengeType);
+            return Challenge(new AuthenticationProperties { RedirectUri = Url.Action("Login") }, config.SecurityConfiguration.HostChallengeType);
         }
 
         [HttpGet]
         [AllowAnonymous]
         [Route("api/login/refresh")]
+        [EndpointName("api-refresh")]
         public async Task<IActionResult> Refresh()
         {
             var authResult = await HttpContext.AuthenticateAsync(config.SecurityConfiguration.HostAuthenticationType);
@@ -73,16 +81,26 @@ namespace IdentityManager2.Api.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("api/logout", Name = IdentityManagerConstants.RouteNames.Logout)]
+        [EndpointName("api-logout")]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(IdentityManagerConstants.LocalApiScheme);
 
-            await config.SecurityConfiguration.SignOut(HttpContext);
+            await this.SignOut(HttpContext);
 
             // if a signout scheme has started a redirect
             if (HttpContext.Response.StatusCode == 302) return StatusCode(302);
-            
+
             return RedirectToRoute(IdentityManagerConstants.RouteNames.Home, null);
+        }
+
+        [NonAction]
+        internal virtual async Task SignOut(HttpContext context)
+        {
+            await context.SignOutAsync(config.SecurityConfiguration.HostAuthenticationType);
+
+            if (!string.IsNullOrWhiteSpace(config.SecurityConfiguration.AdditionalSignOutType))
+                await context.SignOutAsync(config.SecurityConfiguration.AdditionalSignOutType);
         }
     }
 }
