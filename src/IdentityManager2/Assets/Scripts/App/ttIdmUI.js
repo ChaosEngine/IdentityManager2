@@ -135,6 +135,10 @@
                 elem.id = scope.id.trim();
                 elem.find(".btn-primary.confirm").on("click", function () {
                     elem.trigger("confirm");
+                    $(elem).modal('hide');
+                });
+                elem.find(".btn-default").on("click", function () {
+                    $(elem).modal('hide');
                 });
             }
         };
