@@ -823,7 +823,7 @@ a)),c.search(a);else throw H("norout");}};d.$on("$locationChangeStart",m);d.$on(
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
-                .replace(/\"/g, "&quot;")
+                .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#39;");
         }
 
