@@ -68,6 +68,7 @@ namespace IdentityManager2.Api.Controllers
 
         // POST 
         [HttpPost, Route("", Name = IdentityManagerConstants.RouteNames.CreateRole)]
+		[ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateRoleAsync([FromBody] PropertyValue[] properties)
         {
             var meta = await GetMetadataAsync();
@@ -140,6 +141,7 @@ namespace IdentityManager2.Api.Controllers
         }
 
         [HttpDelete, Route("{subject}", Name = IdentityManagerConstants.RouteNames.DeleteRole)]
+		[ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteRoleAsync(string subject)
         {
             var meta = await GetMetadataAsync();
@@ -163,6 +165,7 @@ namespace IdentityManager2.Api.Controllers
         }
 
         [HttpPut, Route("{subject}/properties/{type}", Name = IdentityManagerConstants.RouteNames.UpdateRoleProperty)]
+		[ValidateAntiForgeryToken]
         public async Task<IActionResult> SetPropertyAsync(string subject, string type)
         {
             if (IsNullOrWhiteSpace(subject))

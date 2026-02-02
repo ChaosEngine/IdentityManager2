@@ -388,6 +388,25 @@ a)),c.search(a);else throw H("norout");}};d.$on("$locationChangeStart",m);d.$on(
             return {
                 'request': function(config) {
                     idmErrorService.clear();
+                    
+                    // Add anti-forgery token for non-GET requests
+                    if (config.method && config.method !== 'GET') {
+                        try {
+                            const rvt = document.querySelector('input[name="__RequestVerificationToken"]');
+                            if (rvt) {
+                                const token = rvt.value;
+                                if (token) {
+                                    if (!config.headers) {
+                                        config.headers = {};
+                                    }
+                                    config.headers.RequestVerificationToken = token;
+                                }
+                            }
+                        } catch (e) {
+                            console.error("Failed to extract antiforgery token:", e);
+                        }
+                    }
+                    
                     return config;
                 },
                 'responseError': function(response) {
