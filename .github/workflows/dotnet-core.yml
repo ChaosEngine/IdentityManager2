@@ -27,8 +27,8 @@ jobs:
       run: |
         cd src/IdentityManager2
         dotnet pack -c Release -o publish --no-build 
-    - name: Publish
-      uses: actions/upload-artifact@master
-      with:
-        name: IdentityManager2
-        path: src/IdentityManager2/publish
+#    - name: Publish
+#      uses: actions/upload-artifact@master
+#      with:
+#        name: IdentityManager2
+#        path: src/IdentityManager2/publish
