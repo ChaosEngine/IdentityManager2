@@ -1,9 +1,13 @@
-﻿/// <reference path="../Libs/angular.min.js" />
+﻿/*global angular*/
+/// <reference path="../Libs/angular.min.js" />
 /// <reference path="../Libs/angular-route.min.js" />
 
 (function (angular) {
     const app = angular.module("ttIdmApp", ["ngRoute", "ttIdm", "ttIdmUI", "ttIdmUsers", "ttIdmRoles"]);
-    function config(PathBase, $routeProvider) {
+    function config(PathBase, $routeProvider, $locationProvider) {
+        // Configure hash prefix to empty string for compatibility with Angular 1.3.x URLs
+        $locationProvider.hashPrefix('');
+        
         $routeProvider
             .when("/", {
                 templateUrl: PathBase + "/assets/Templates.home.html"
@@ -15,7 +19,7 @@
                 redirectTo: "/"
             });
     }
-    config.$inject = ["PathBase", "$routeProvider"];
+    config.$inject = ["PathBase", "$routeProvider", "$locationProvider"];
     app.config(config);
 
     function LayoutCtrl($rootScope, PathBase, idmApi, $location, $window, idmErrorService, ShowLoginButton,

@@ -19,6 +19,14 @@ namespace Microsoft.Extensions.DependencyInjection
             var identityManagerOptions = services.BuildServiceProvider().GetRequiredService<IOptions<IdentityManagerOptions>>().Value;
             identityManagerOptions.Validate();
 
+            services.AddAntiforgery(options =>
+            {
+                // options.HeaderName = "X-XSRF-TOKEN";
+                // options.Cookie.Name = "XSRF-TOKEN";
+                options.Cookie.HttpOnly = false;
+                options.Cookie.SameSite = SameSiteMode.Strict;
+            });
+
             services.AddControllersWithViews()
             .AddJsonOptions(static options =>
             {

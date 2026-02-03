@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using Duende.IdentityServer.Models;
+using Duende.IdentityServer.Test;
 using Hosts.Shared.InMemory;
 using IdentityManager2.Configuration;
-using IdentityServer4.Models;
-using IdentityServer4.Test;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 

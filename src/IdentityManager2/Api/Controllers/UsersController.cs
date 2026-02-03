@@ -55,6 +55,7 @@ namespace IdentityManager2.Api.Controllers
         }
 
         [HttpPost("", Name = IdentityManagerConstants.RouteNames.CreateUser)]
+		[ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUserAsync([FromBody] PropertyValue[] properties)
         {
             var meta = await GetMetadataAsync();
@@ -135,6 +136,7 @@ namespace IdentityManager2.Api.Controllers
         }
 
         [HttpDelete, Route("{subject}", Name = IdentityManagerConstants.RouteNames.DeleteUser)]
+		[ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteUserAsync(string subject)
         {
             var meta = await GetMetadataAsync();
@@ -164,6 +166,7 @@ namespace IdentityManager2.Api.Controllers
         }
 
         [HttpPut, Route("{subject}/properties/{type}", Name = IdentityManagerConstants.RouteNames.UpdateUserProperty)]
+		[ValidateAntiForgeryToken]
         public async Task<IActionResult> SetPropertyAsync(string subject, string type)
         {
             if (IsNullOrWhiteSpace(subject))
@@ -194,6 +197,7 @@ namespace IdentityManager2.Api.Controllers
         }
 
         [HttpPost, Route("{subject}/claims", Name = IdentityManagerConstants.RouteNames.AddClaim)]
+		[ValidateAntiForgeryToken]
         public async Task<IActionResult> AddClaimAsync(string subject, [FromBody] ClaimValue model)
         {
             var meta = await GetMetadataAsync();
@@ -229,6 +233,7 @@ namespace IdentityManager2.Api.Controllers
         }
 
         [HttpDelete, Route("{subject}/claims/{type}/{value}", Name = IdentityManagerConstants.RouteNames.RemoveClaim)]
+		[ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveClaimAsync(string subject, string type, string value)
         {
             type = type.FromBase64UrlEncoded();
@@ -257,6 +262,7 @@ namespace IdentityManager2.Api.Controllers
         }
 
         [HttpPost, Route("{subject}/roles/{role}", Name = IdentityManagerConstants.RouteNames.AddRole)]
+		[ValidateAntiForgeryToken]
         public async Task<IActionResult> AddRoleAsync(string subject, string role)
         {
             var meta = await GetMetadataAsync();
@@ -282,6 +288,7 @@ namespace IdentityManager2.Api.Controllers
         }
 
         [HttpDelete, Route("{subject}/roles/{role}", Name = IdentityManagerConstants.RouteNames.RemoveRole)]
+		[ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveRoleAsync(string subject, string role)
         {
             var meta = await GetMetadataAsync();

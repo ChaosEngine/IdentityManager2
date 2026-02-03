@@ -1,4 +1,5 @@
-﻿/// <reference path="../Libs/angular.min.js" />
+﻿/*global angular*/
+/// <reference path="../Libs/angular.min.js" />
 /// <reference path="../Libs/angular-route.min.js" />
 
 (function (angular) {
@@ -68,20 +69,22 @@
                     });
                 });
             }
-        }
+        };
     }
     ttFocus.$inject = [];
     app.directive("ttFocus", ttFocus);
 
-    function ttMatch($timeout) {
+    function ttMatch($timeout, $parse) {
         return {
             restrict: 'A',
             require: 'ngModel',
             link: function (scope, elem, attrs, ctrl) {
+                var matchGetter = $parse(attrs.ttMatch);
+                
                 function check() {
                     if (ctrl.$dirty) {
                         var thisVal = elem.val();
-                        var otherVal = scope.$eval(attrs.ttMatch);
+                        var otherVal = matchGetter(scope);
                         if (!thisVal || thisVal === otherVal) {
                             ctrl.$setValidity('ttMatch', true);
                         }
@@ -95,13 +98,13 @@
                         scope.$apply(check);
                     });
                 });
-                scope.$watch(attrs.ttMatch, function (val) {
+                scope.$watch(attrs.ttMatch, function (/* val */) {
                     check();
                 });
             }
-        }
+        };
     }
-    ttMatch.$inject = ["$timeout"];
+    ttMatch.$inject = ["$timeout", "$parse"];
     app.directive("ttMatch", ttMatch);
 
     function ttPropertyEditor(PathBase){
@@ -113,7 +116,7 @@
                 property: '=',
                 setProperty: '=setProperty'
             },
-            link: function (scope, elem, attrs, ctrl) {
+            link: function (/* scope, elem, attrs, ctrl */) {
             }
         };
     }
@@ -130,13 +133,17 @@
                 id: '@',
                 action: '@'
             },
-            link: function (scope, elem, attrs, ctrl) {
+            link: function (scope, elem/* , attrs, ctrl */) {
                 elem.id = scope.id.trim();
                 elem.find(".btn-primary.confirm").on("click", function () {
                     elem.trigger("confirm");
+                    $(elem).modal('hide');
+                });
+                elem.find(".btn-default").on("click", function () {
+                    $(elem).modal('hide');
                 });
             }
-        }
+        };
     }
     ttPrompt.$inject = ["PathBase"];
     app.directive("ttPrompt", ttPrompt);
@@ -149,7 +156,7 @@
                 pager: '=',
                 path: "@"
             }
-        }
+        };
     }
     ttPagerButtons.$inject = ["PathBase"];
     app.directive("ttPagerButtons", ttPagerButtons);
@@ -161,15 +168,38 @@
             scope: {
                 pager: '='
             }
-        }
+        };
     }
     ttPagerSummary.$inject = ["PathBase"];
     app.directive("ttPagerSummary", ttPagerSummary);
 
     function idmPager($sce) {
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
+        var allowedPagerHtml = {
+            "<strong>&lt;&lt;</strong>": true,
+            "<strong>&lt;</strong>": true,
+            "<strong>&gt;</strong>": true,
+            "<strong>&gt;&gt;</strong>": true
+        };
+
+        function trustPagerText(text) {
+            if (allowedPagerHtml[text]) {
+                return $sce.trustAsHtml(text);
+            }
+            return $sce.trustAsHtml(escapeHtml(text));
+        }
+
         function Pager(result, pageSize) {
             function PagerButton(text, page, enabled, current) {
-                this.text = $sce.trustAsHtml(text + "");
+                this.text = trustPagerText(text);
                 this.page = page;
                 this.enabled = enabled;
                 this.current = current;
@@ -230,19 +260,31 @@
                 elem.on("click", function (e) {
                     if (prevent) {
                         e.preventDefault();
-                        $(attrs.ttConfirmClick).modal('show');
+                        var selector = attrs.ttConfirmClick || "";
+                        if (selector.indexOf("#") !== 0) {
+                            return;
+                        }
+                        var id = selector.substring(1);
+                        if (!/^[A-Za-z][\w\-:.]*$/.test(id)) {
+                            return;
+                        }
+                        var modalElem = document.getElementById(id);
+                        if (!modalElem) {
+                            return;
+                        }
+                        $(modalElem).modal('show');
                         if (!cb) {
                             cb = function () {
                                 $(this).off("confirm");
                                 prevent = false;
                                 elem.trigger("click");
                             };
-                            $(attrs.ttConfirmClick).on("confirm", cb);
+                            $(modalElem).on("confirm", cb);
                         }
                     }
                 });
             }
-        }
+        };
     }
     ttConfirmClick.$inject = [];
     app.directive("ttConfirmClick", ttConfirmClick);
@@ -254,7 +296,7 @@
                 model: "=message"
             },
             templateUrl: PathBase + '/assets/Templates.message.html',
-            link: function (scope, elem, attrs) {
+            link: function (scope/* , elem, attrs */) {
                 scope.$watch("model.message", function(){
                     scope.message = scope.model.message;
                 });
@@ -274,7 +316,7 @@
                     e.preventDefault();
                 });
             }
-        }
+        };
     }
     idmPreventDefault.$inject = [];
     app.directive("idmPreventDefault", idmPreventDefault);
