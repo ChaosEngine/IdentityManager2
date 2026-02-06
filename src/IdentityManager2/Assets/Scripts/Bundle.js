@@ -403,6 +403,7 @@ a)),c.search(a);else throw H("norout");}};d.$on("$locationChangeStart",m);d.$on(
                                 }
                             }
                         } catch (e) {
+                            // eslint-disable-next-line no-console
                             console.error("Failed to extract antiforgery token:", e);
                         }
                     }
