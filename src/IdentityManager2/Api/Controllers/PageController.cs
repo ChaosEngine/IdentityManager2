@@ -12,6 +12,7 @@ namespace IdentityManager2.Api.Controllers
 {
     [SecurityHeaders]
     [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    [Authorize(IdentityManagerConstants.IdMgrAuthPolicy)]
     public class PageController : Controller
     {
         private readonly IdentityManagerOptions config;
@@ -56,7 +57,6 @@ namespace IdentityManager2.Api.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
         [Route("api/login/refresh")]
         public async Task<IActionResult> Refresh()
         {
@@ -71,7 +71,6 @@ namespace IdentityManager2.Api.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
         [Route("api/logout", Name = IdentityManagerConstants.RouteNames.Logout)]
         public async Task<IActionResult> Logout()
         {
