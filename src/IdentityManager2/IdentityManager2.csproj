@@ -15,6 +15,11 @@
     <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
     <!--<PublishTrimmed>true</PublishTrimmed>
     <TrimMode>partial</TrimMode>-->
+
+    <!-- Suppress obsolete-API warnings in auto-generated JSON source-generator files (SYSLIB0026/27/28 for X509Certificate2/PublicKey).
+         The System.Text.Json source generator transitively includes X509Certificate2/PublicKey in its generated serializers because
+         ASP.NET Core identity types indirectly reference them. The generated .g.cs files cannot be edited. -->
+    <NoWarn>$(NoWarn);SYSLIB0026;SYSLIB0027;SYSLIB0028</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
