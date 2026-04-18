@@ -393,14 +393,14 @@ a)),c.search(a);else throw H("norout");}};d.$on("$locationChangeStart",m);d.$on(
                     if (config.method && config.method !== 'GET') {
                         try {
                             const rvt = document.querySelector('input[name="__RequestVerificationToken"]');
-                            if (rvt) {
-                                const token = rvt.value;
-                                if (token) {
-                                    if (!config.headers) {
-                                        config.headers = {};
-                                    }
-                                    config.headers.RequestVerificationToken = token;
+                            if (rvt && rvt.value) {
+                                if (!config.headers) {
+                                    config.headers = {};
                                 }
+                                config.headers.RequestVerificationToken = rvt.value;
+                            } else {
+                                // eslint-disable-next-line no-console
+                                console.warn("Anti-forgery token not present in DOM; state-changing request proceeds without CSRF protection.");
                             }
                         } catch (e) {
                             // eslint-disable-next-line no-console
@@ -504,7 +504,7 @@ a)),c.search(a);else throw H("norout");}};d.$on("$locationChangeStart",m);d.$on(
                         if (resp.status === 403) {
                             throw "You are not authorized to use this service.";
                         } else {
-                            throw resp.data && (resp.data.exceptionMessage || resp.data.message) ||
+                            throw resp.data && resp.data.message ||
                                 "Failed to access IdentityManager API.";
                         }
                     });
@@ -515,7 +515,7 @@ a)),c.search(a);else throw H("norout");}};d.$on("$locationChangeStart",m);d.$on(
     idmApi.$inject = ["$http", "$q", "PathBase"];
     app.factory("idmApi", idmApi);
 
-    function idmUsers($http, idmApi, $log) {
+    function idmUsers($http, idmApi) {
         function nop() {
         }
 
@@ -526,9 +526,6 @@ a)),c.search(a);else throw H("norout");}};d.$on("$locationChangeStart",m);d.$on(
         function errorHandler(msg) {
             msg = msg || "Unexpected Error";
             return function (response) {
-                if (response.data.exceptionMessage) {
-                    $log.error(response.data.exceptionMessage);
-                }
                 throw response.data.errors || response.data.message || msg;
             };
         }
@@ -590,10 +587,10 @@ a)),c.search(a);else throw H("norout");}};d.$on("$locationChangeStart",m);d.$on(
 
         return svc;
     }
-    idmUsers.$inject = ["$http", "idmApi", "$log"];
+    idmUsers.$inject = ["$http", "idmApi"];
     app.factory("idmUsers", idmUsers);
 
-    function idmRoles($http, idmApi, $log) {
+    function idmRoles($http, idmApi) {
         function nop() {
         }
 
@@ -604,9 +601,6 @@ a)),c.search(a);else throw H("norout");}};d.$on("$locationChangeStart",m);d.$on(
         function errorHandler(msg) {
             msg = msg || "Unexpected Error";
             return function(response) {
-                if (response.data.exceptionMessage) {
-                    $log.error(response.data.exceptionMessage);
-                }
                 throw response.data.errors || response.data.message || msg;
             };
         }
@@ -650,7 +644,7 @@ a)),c.search(a);else throw H("norout");}};d.$on("$locationChangeStart",m);d.$on(
 
         return svc;
     }
-    idmRoles.$inject = ["$http", "idmApi", "$log"];
+    idmRoles.$inject = ["$http", "idmApi"];
     app.factory("idmRoles", idmRoles);
 })(angular);
 
@@ -837,33 +831,10 @@ a)),c.search(a);else throw H("norout");}};d.$on("$locationChangeStart",m);d.$on(
     ttPagerSummary.$inject = ["PathBase"];
     app.directive("ttPagerSummary", ttPagerSummary);
 
-    function idmPager($sce) {
-        function escapeHtml(value) {
-            return String(value)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#39;");
-        }
-
-        var allowedPagerHtml = {
-            "<strong>&lt;&lt;</strong>": true,
-            "<strong>&lt;</strong>": true,
-            "<strong>&gt;</strong>": true,
-            "<strong>&gt;&gt;</strong>": true
-        };
-
-        function trustPagerText(text) {
-            if (allowedPagerHtml[text]) {
-                return $sce.trustAsHtml(text);
-            }
-            return $sce.trustAsHtml(escapeHtml(text));
-        }
-
+    function idmPager() {
         function Pager(result, pageSize) {
             function PagerButton(text, page, enabled, current) {
-                this.text = trustPagerText(text);
+                this.text = String(text);
                 this.page = page;
                 this.enabled = enabled;
                 this.current = current;
@@ -900,19 +871,19 @@ a)),c.search(a);else throw H("norout");}};d.$on("$locationChangeStart",m);d.$on(
             var nextPage = this.currentPage + pageSkip;
             if (nextPage > this.totalPages) nextPage = this.totalPages;
 
-            this.buttons.push(new PagerButton("<strong>&lt;&lt;</strong>", 1, endButton > totalButtons));
-            this.buttons.push(new PagerButton("<strong>&lt;</strong>", prevPage, endButton > totalButtons));
+            this.buttons.push(new PagerButton("«", 1, endButton > totalButtons));
+            this.buttons.push(new PagerButton("‹", prevPage, endButton > totalButtons));
 
             for (var i = startButton; i <= endButton; i++) {
                 this.buttons.push(new PagerButton(i, i, true, i === this.currentPage));
             }
 
-            this.buttons.push(new PagerButton("<strong>&gt;</strong>", nextPage, endButton < this.totalPages));
-            this.buttons.push(new PagerButton("<strong>&gt;&gt;</strong>", this.totalPages, endButton < this.totalPages));
+            this.buttons.push(new PagerButton("›", nextPage, endButton < this.totalPages));
+            this.buttons.push(new PagerButton("»", this.totalPages, endButton < this.totalPages));
         }
         return Pager;
     }
-    idmPager.$inject = ["$sce"];
+    idmPager.$inject = [];
     app.service("idmPager", idmPager);
 
     function ttConfirmClick() {
@@ -1368,16 +1339,21 @@ a)),c.search(a);else throw H("norout");}};d.$on("$locationChangeStart",m);d.$on(
 
         load();
 
+        function isSafePath(path) {
+            // Must start with a single '/' to prevent open redirect via protocol-relative URLs or javascript: schemes
+            return typeof path === 'string' && path.length > 1 && path.charAt(0) === '/' && path.charAt(1) !== '/';
+        }
+
         $rootScope.login = function () {
             idmErrorService.clear();
-
-            $window.location = PathBase + (LoginPath || "/api/login");
+            const path = isSafePath(LoginPath) ? LoginPath : "/api/login";
+            $window.location = PathBase + path;
         };
 
         $rootScope.logout = function() {
             idmErrorService.clear();
-
-            $window.location = PathBase + (LogoutPath || "/api/logout");
+            const path = isSafePath(LogoutPath) ? LogoutPath : "/api/logout";
+            $window.location = PathBase + path;
         };
     }
     LayoutCtrl.$inject = ["$rootScope", "PathBase", "idmApi", "$location", "$window", "idmErrorService", "ShowLoginButton",

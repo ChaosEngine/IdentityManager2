@@ -173,33 +173,10 @@
     ttPagerSummary.$inject = ["PathBase"];
     app.directive("ttPagerSummary", ttPagerSummary);
 
-    function idmPager($sce) {
-        function escapeHtml(value) {
-            return String(value)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#39;");
-        }
-
-        var allowedPagerHtml = {
-            "<strong>&lt;&lt;</strong>": true,
-            "<strong>&lt;</strong>": true,
-            "<strong>&gt;</strong>": true,
-            "<strong>&gt;&gt;</strong>": true
-        };
-
-        function trustPagerText(text) {
-            if (allowedPagerHtml[text]) {
-                return $sce.trustAsHtml(text);
-            }
-            return $sce.trustAsHtml(escapeHtml(text));
-        }
-
+    function idmPager() {
         function Pager(result, pageSize) {
             function PagerButton(text, page, enabled, current) {
-                this.text = trustPagerText(text);
+                this.text = String(text);
                 this.page = page;
                 this.enabled = enabled;
                 this.current = current;
@@ -236,19 +213,19 @@
             var nextPage = this.currentPage + pageSkip;
             if (nextPage > this.totalPages) nextPage = this.totalPages;
 
-            this.buttons.push(new PagerButton("<strong>&lt;&lt;</strong>", 1, endButton > totalButtons));
-            this.buttons.push(new PagerButton("<strong>&lt;</strong>", prevPage, endButton > totalButtons));
+            this.buttons.push(new PagerButton("«", 1, endButton > totalButtons));
+            this.buttons.push(new PagerButton("‹", prevPage, endButton > totalButtons));
 
             for (var i = startButton; i <= endButton; i++) {
                 this.buttons.push(new PagerButton(i, i, true, i === this.currentPage));
             }
 
-            this.buttons.push(new PagerButton("<strong>&gt;</strong>", nextPage, endButton < this.totalPages));
-            this.buttons.push(new PagerButton("<strong>&gt;&gt;</strong>", this.totalPages, endButton < this.totalPages));
+            this.buttons.push(new PagerButton("›", nextPage, endButton < this.totalPages));
+            this.buttons.push(new PagerButton("»", this.totalPages, endButton < this.totalPages));
         }
         return Pager;
     }
-    idmPager.$inject = ["$sce"];
+    idmPager.$inject = [];
     app.service("idmPager", idmPager);
 
     function ttConfirmClick() {

@@ -16,14 +16,14 @@
                     if (config.method && config.method !== 'GET') {
                         try {
                             const rvt = document.querySelector('input[name="__RequestVerificationToken"]');
-                            if (rvt) {
-                                const token = rvt.value;
-                                if (token) {
-                                    if (!config.headers) {
-                                        config.headers = {};
-                                    }
-                                    config.headers.RequestVerificationToken = token;
+                            if (rvt && rvt.value) {
+                                if (!config.headers) {
+                                    config.headers = {};
                                 }
+                                config.headers.RequestVerificationToken = rvt.value;
+                            } else {
+                                // eslint-disable-next-line no-console
+                                console.warn("Anti-forgery token not present in DOM; state-changing request proceeds without CSRF protection.");
                             }
                         } catch (e) {
                             // eslint-disable-next-line no-console
@@ -127,7 +127,7 @@
                         if (resp.status === 403) {
                             throw "You are not authorized to use this service.";
                         } else {
-                            throw resp.data && (resp.data.exceptionMessage || resp.data.message) ||
+                            throw resp.data && resp.data.message ||
                                 "Failed to access IdentityManager API.";
                         }
                     });
@@ -138,7 +138,7 @@
     idmApi.$inject = ["$http", "$q", "PathBase"];
     app.factory("idmApi", idmApi);
 
-    function idmUsers($http, idmApi, $log) {
+    function idmUsers($http, idmApi) {
         function nop() {
         }
 
@@ -149,9 +149,6 @@
         function errorHandler(msg) {
             msg = msg || "Unexpected Error";
             return function (response) {
-                if (response.data.exceptionMessage) {
-                    $log.error(response.data.exceptionMessage);
-                }
                 throw response.data.errors || response.data.message || msg;
             };
         }
@@ -213,10 +210,10 @@
 
         return svc;
     }
-    idmUsers.$inject = ["$http", "idmApi", "$log"];
+    idmUsers.$inject = ["$http", "idmApi"];
     app.factory("idmUsers", idmUsers);
 
-    function idmRoles($http, idmApi, $log) {
+    function idmRoles($http, idmApi) {
         function nop() {
         }
 
@@ -227,9 +224,6 @@
         function errorHandler(msg) {
             msg = msg || "Unexpected Error";
             return function(response) {
-                if (response.data.exceptionMessage) {
-                    $log.error(response.data.exceptionMessage);
-                }
                 throw response.data.errors || response.data.message || msg;
             };
         }
@@ -273,7 +267,7 @@
 
         return svc;
     }
-    idmRoles.$inject = ["$http", "idmApi", "$log"];
+    idmRoles.$inject = ["$http", "idmApi"];
     app.factory("idmRoles", idmRoles);
 })(angular);
 

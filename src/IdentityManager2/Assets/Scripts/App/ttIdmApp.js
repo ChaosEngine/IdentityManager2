@@ -53,16 +53,21 @@
 
         load();
 
+        function isSafePath(path) {
+            // Must start with a single '/' to prevent open redirect via protocol-relative URLs or javascript: schemes
+            return typeof path === 'string' && path.length > 1 && path.charAt(0) === '/' && path.charAt(1) !== '/';
+        }
+
         $rootScope.login = function () {
             idmErrorService.clear();
-
-            $window.location = PathBase + (LoginPath || "/api/login");
+            const path = isSafePath(LoginPath) ? LoginPath : "/api/login";
+            $window.location = PathBase + path;
         };
 
         $rootScope.logout = function() {
             idmErrorService.clear();
-
-            $window.location = PathBase + (LogoutPath || "/api/logout");
+            const path = isSafePath(LogoutPath) ? LogoutPath : "/api/logout";
+            $window.location = PathBase + path;
         };
     }
     LayoutCtrl.$inject = ["$rootScope", "PathBase", "idmApi", "$location", "$window", "idmErrorService", "ShowLoginButton",
