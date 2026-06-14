@@ -388,7 +388,7 @@ namespace InkBall.Module.Hubs
 
 			int maxCachedId = cachedPaths?.Count > 0 ? cachedPaths.Max(p => p.iId) : 0;
 
-			var newPaths = (await _dbContext.GetPathsFromDatabaseAsync(gameId, false, true, maxCachedId, token)).ToList();
+			var newPaths = (await _dbContext.GetPathsFromDatabaseAsync(gameId, false, true, maxCachedId, token: token)).ToList();
 
 			if (newPaths.Count == 0)
 				return cachedPaths ?? [];

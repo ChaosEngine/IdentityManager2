@@ -904,7 +904,7 @@ namespace InkBall.Module.Model
 		}
 
 		protected internal async Task<IEnumerable<InkBallPath>> GetPathsFromDatabaseAsync(int iGameID, bool reserializeJsonPath,
-			bool createPathPointCollection, int newerThanId = 0, CancellationToken token = default)
+			bool createPathPointCollection, int iNewerThanId = 0, CancellationToken token = default)
 		{
 			///Detect type of operation to pre-perform on paths:
 			/// - reconstruct full JSON path or not
@@ -915,7 +915,7 @@ namespace InkBall.Module.Model
 				createPathPointCollection_HandlerImpl : (_, _) => { /* dummy empty body*/ };
 
 			var paths = await InkBallPath.AsNoTracking()
-				 .Where(pa => pa.iGameId == iGameID && (newerThanId <= 0 || pa.iId > newerThanId))
+				 .Where(pa => pa.iGameId == iGameID && (iNewerThanId <= 0 || pa.iId > iNewerThanId))
 				 .Select(m => LoadPointsInPathFromJson(m, jsonPath_Handler, createPathPointCollection_Handler))
 				 .ToListAsync(token);
 
