@@ -4,7 +4,7 @@
   "private": true,
   "devDependencies": {
     "gulp": "^5.0.1",
-    "gulp-clean-css": "^4.3.0",
+    "@aptuitiv/gulp-clean-css": "^4.4.3",
     "gulp-concat": "^2.6.1",
     "gulp-less": "^5.0.0"
   }
