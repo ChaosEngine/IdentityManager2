@@ -3,13 +3,13 @@
 /// <reference path="../Libs/angular-route.min.js" />
 
 (function (angular) {
-    var app = angular.module("ttIdmUI", []);
+    const app = angular.module("ttIdmUI", []);
 
     app.factory("ttFeedback", function () {
         function Feedback() {
-            var self = this;
-            var _errors;
-            var _message;
+            const self = this;
+            let _errors;
+            let _message;
 
             self.clear = function () {
                 _errors = null;
@@ -79,12 +79,12 @@
             restrict: 'A',
             require: 'ngModel',
             link: function (scope, elem, attrs, ctrl) {
-                var matchGetter = $parse(attrs.ttMatch);
+                const matchGetter = $parse(attrs.ttMatch);
                 
                 function check() {
                     if (ctrl.$dirty) {
-                        var thisVal = elem.val();
-                        var otherVal = matchGetter(scope);
+                        const thisVal = elem.val();
+                        const otherVal = matchGetter(scope);
                         if (!thisVal || thisVal === otherVal) {
                             ctrl.$setValidity('ttMatch', true);
                         }
@@ -107,10 +107,10 @@
     ttMatch.$inject = ["$timeout", "$parse"];
     app.directive("ttMatch", ttMatch);
 
-    function ttPropertyEditor(PathBase){
+    function ttPropertyEditor(PathBase, ttSafeDom){
         return {
             restrict:'E',
-            templateUrl: PathBase + '/assets/Templates.editor.property.html',
+            templateUrl: ttSafeDom.safeTemplateUrl(PathBase, '/assets/Templates.editor.property.html'),
             replace: true,
             scope: {
                 property: '=',
@@ -120,13 +120,13 @@
             }
         };
     }
-    ttPropertyEditor.$inject = ["PathBase"];
+    ttPropertyEditor.$inject = ["PathBase", "ttSafeDom"];
     app.directive("ttPropertyEditor", ttPropertyEditor);
 
-    function ttPrompt(PathBase) {
+    function ttPrompt(PathBase, ttSafeDom) {
         return {
             restrict: 'E',
-            templateUrl: PathBase + '/assets/Templates.modal.html',
+            templateUrl: ttSafeDom.safeTemplateUrl(PathBase, '/assets/Templates.modal.html'),
             replace: true,
             transclude: true,
             scope: {
@@ -134,7 +134,11 @@
                 action: '@'
             },
             link: function (scope, elem/* , attrs, ctrl */) {
-                elem.id = scope.id.trim();
+                const safeId = ttSafeDom.safeDomId(scope.id);
+                if (safeId) {
+                    elem.attr("id", safeId);
+                }
+
                 elem.find(".btn-primary.confirm").on("click", function () {
                     elem.trigger("confirm");
                     $(elem).modal('hide');
@@ -145,32 +149,32 @@
             }
         };
     }
-    ttPrompt.$inject = ["PathBase"];
+    ttPrompt.$inject = ["PathBase", "ttSafeDom"];
     app.directive("ttPrompt", ttPrompt);
 
-    function ttPagerButtons(PathBase) {
+    function ttPagerButtons(PathBase, ttSafeDom) {
         return {
             restrict: 'E',
-            templateUrl: PathBase + '/assets/Templates.pager.buttons.html',
+            templateUrl: ttSafeDom.safeTemplateUrl(PathBase, '/assets/Templates.pager.buttons.html'),
             scope: {
                 pager: '=',
                 path: "@"
             }
         };
     }
-    ttPagerButtons.$inject = ["PathBase"];
+    ttPagerButtons.$inject = ["PathBase", "ttSafeDom"];
     app.directive("ttPagerButtons", ttPagerButtons);
 
-    function ttPagerSummary(PathBase) {
+    function ttPagerSummary(PathBase, ttSafeDom) {
         return {
             restrict: 'E',
-            templateUrl: PathBase + '/assets/Templates.pager.summary.html',
+            templateUrl: ttSafeDom.safeTemplateUrl(PathBase, '/assets/Templates.pager.summary.html'),
             scope: {
                 pager: '='
             }
         };
     }
-    ttPagerSummary.$inject = ["PathBase"];
+    ttPagerSummary.$inject = ["PathBase", "ttSafeDom"];
     app.directive("ttPagerSummary", ttPagerSummary);
 
     function idmPager() {
@@ -195,28 +199,28 @@
 
             this.buttons = [];
 
-            var totalButtons = 7; // ensure this is odd
-            var pageSkip = 10;
-            var startButton = 1;
+            const totalButtons = 7; // ensure this is odd
+            const pageSkip = 10;
+            let startButton = 1;
             if (this.currentPage > Math.floor(totalButtons / 2)) startButton = this.currentPage - Math.floor(totalButtons / 2);
 
-            var endButton = startButton + totalButtons - 1;
+            let endButton = startButton + totalButtons - 1;
             if (endButton >= this.totalPages) endButton = this.totalPages;
             if (this.totalPages > totalButtons &&
                 (endButton - startButton + 1) < totalButtons) {
                 startButton = endButton - totalButtons + 1;
             }
 
-            var prevPage = this.currentPage - pageSkip;
+            let prevPage = this.currentPage - pageSkip;
             if (prevPage < 1) prevPage = 1;
 
-            var nextPage = this.currentPage + pageSkip;
+            let nextPage = this.currentPage + pageSkip;
             if (nextPage > this.totalPages) nextPage = this.totalPages;
 
             this.buttons.push(new PagerButton("«", 1, endButton > totalButtons));
             this.buttons.push(new PagerButton("‹", prevPage, endButton > totalButtons));
 
-            for (var i = startButton; i <= endButton; i++) {
+            for (let i = startButton; i <= endButton; i++) {
                 this.buttons.push(new PagerButton(i, i, true, i === this.currentPage));
             }
 
@@ -232,20 +236,19 @@
         return {
             restrict: 'A',
             link: function (scope, elem, attrs) {
-                var prevent = true;
-                var cb = null;
+                let prevent = true, cb = null;
                 elem.on("click", function (e) {
                     if (prevent) {
                         e.preventDefault();
-                        var selector = attrs.ttConfirmClick || "";
+                        const selector = attrs.ttConfirmClick || "";
                         if (selector.indexOf("#") !== 0) {
                             return;
                         }
-                        var id = selector.substring(1);
+                        const id = selector.substring(1);
                         if (!/^[A-Za-z][\w\-:.]*$/.test(id)) {
                             return;
                         }
-                        var modalElem = document.getElementById(id);
+                        const modalElem = document.getElementById(id);
                         if (!modalElem) {
                             return;
                         }
@@ -266,13 +269,13 @@
     ttConfirmClick.$inject = [];
     app.directive("ttConfirmClick", ttConfirmClick);
 
-    function idmMessage(PathBase) {
+    function idmMessage(PathBase, ttSafeDom) {
         return {
             restrict: 'E',
             scope: {
                 model: "=message"
             },
-            templateUrl: PathBase + '/assets/Templates.message.html',
+            templateUrl: ttSafeDom.safeTemplateUrl(PathBase, '/assets/Templates.message.html'),
             link: function (scope/* , elem, attrs */) {
                 scope.$watch("model.message", function(){
                     scope.message = scope.model.message;
@@ -283,7 +286,7 @@
             }
         };
     }
-    idmMessage.$inject = ["PathBase"];
+    idmMessage.$inject = ["PathBase", "ttSafeDom"];
     app.directive("idmMessage", idmMessage);
 
     function idmPreventDefault() {

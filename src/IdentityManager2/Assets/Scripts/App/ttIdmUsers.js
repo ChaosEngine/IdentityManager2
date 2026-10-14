@@ -4,13 +4,22 @@
 
 (function (angular) {
 
-    var app = angular.module("ttIdmUsers", ['ngRoute', 'ttIdm', 'ttIdmUI']);
+    const app = angular.module("ttIdmUsers", ['ngRoute', 'ttIdm', 'ttIdmUI']);
+    function safeTemplateUrl(pathBase, templatePath) {
+        const base = typeof pathBase === "string" ? pathBase.trim().replace(/\/$/, "") : "";
+        if (typeof templatePath !== "string" || templatePath.charAt(0) !== "/") {
+            return base + "/assets/Templates.message.html";
+        }
+
+        return base + templatePath;
+    }
+
     function config($routeProvider, PathBase) {
         $routeProvider
             .when("/users/list/:filter?/:page?", {
                 controller: 'ListUsersCtrl',
                 resolve: { users: "idmUsers" },
-                templateUrl: PathBase + '/assets/Templates.users.list.html'
+                templateUrl: safeTemplateUrl(PathBase, '/assets/Templates.users.list.html')
             })
             .when("/users/create", {
                 controller: 'NewUserCtrl',
@@ -19,19 +28,19 @@
                         return idmApi.get();
                     }
                 },
-                templateUrl: PathBase + '/assets/Templates.users.new.html'
+                templateUrl: safeTemplateUrl(PathBase, '/assets/Templates.users.new.html')
             })
             .when("/users/edit/:subject", {
                 controller: 'EditUserCtrl',
                 resolve: { users: "idmUsers" },
-                templateUrl: PathBase + '/assets/Templates.users.edit.html'
+                templateUrl: safeTemplateUrl(PathBase, '/assets/Templates.users.edit.html')
             });
     }
     config.$inject = ["$routeProvider", "PathBase"];
     app.config(config);
 
     function ListUsersCtrl($scope, idmUsers, idmPager, $routeParams, $location) {
-        var model = {
+        const model = {
             message : null,
             users : null,
             pager : null,
@@ -42,15 +51,15 @@
         $scope.model = model;
 
         $scope.search = function (filter) {
-            var url = "/users/list";
+            let url = "/users/list";
             if (filter) {
                 url += "/" + filter;
             }
             $location.url(url);
         };
 
-        var itemsPerPage = 10;
-        var startItem = (model.page - 1) * itemsPerPage;
+        const itemsPerPage = 10;
+        const startItem = (model.page - 1) * itemsPerPage;
 
         idmUsers.getUsers(model.filter, startItem, itemsPerPage).then(function (result) {
             $scope.model.waiting = false;
@@ -67,14 +76,14 @@
     app.controller("ListUsersCtrl", ListUsersCtrl);
 
     function NewUserCtrl($scope, idmUsers, api, ttFeedback) {
-        var feedback = new ttFeedback();
+        const feedback = new ttFeedback();
         $scope.feedback = feedback;
         if (!api.links.createUser) {
             feedback.errors = "Create Not Supported";
             return;
         }
         else {
-            var properties = api.links.createUser.meta
+            const properties = api.links.createUser.meta
                 .map(function (item) {
                     return {
                         meta : item,
@@ -83,7 +92,7 @@
                 });
             $scope.properties = properties;
             $scope.create = function (properties) {
-                var props = properties.map(function (item) {
+                const props = properties.map(function (item) {
                     return {
                         type: item.meta.type,
                         value: item.data.toString()
@@ -101,7 +110,7 @@
     app.controller("NewUserCtrl", NewUserCtrl);
 
     function EditUserCtrl($scope, idmUsers, $routeParams, ttFeedback) {
-        var feedback = new ttFeedback();
+        const feedback = new ttFeedback();
         $scope.feedback = feedback;
 
         function loadUser() {

@@ -4,13 +4,22 @@
 
 (function (angular) {
 
-    var app = angular.module("ttIdmRoles", ['ngRoute', 'ttIdm', 'ttIdmUI']);
+    const app = angular.module("ttIdmRoles", ['ngRoute', 'ttIdm', 'ttIdmUI']);
+    function safeTemplateUrl(pathBase, templatePath) {
+        const base = typeof pathBase === "string" ? pathBase.trim().replace(/\/$/, "") : "";
+        if (typeof templatePath !== "string" || templatePath.charAt(0) !== "/") {
+            return base + "/assets/Templates.message.html";
+        }
+
+        return base + templatePath;
+    }
+
     function config($routeProvider, PathBase) {
         $routeProvider
             .when("/roles/list/:filter?/:page?", {
                 controller: 'ListRolesCtrl',
                 resolve: { roles: "idmRoles" },
-                templateUrl: PathBase + '/assets/Templates.roles.list.html'
+                templateUrl: safeTemplateUrl(PathBase, '/assets/Templates.roles.list.html')
             })
             .when("/roles/create", {
                 controller: 'NewRoleCtrl',
@@ -19,19 +28,19 @@
                         return idmApi.get();
                     }
                 },
-                templateUrl: PathBase + '/assets/Templates.roles.new.html'
+                templateUrl: safeTemplateUrl(PathBase, '/assets/Templates.roles.new.html')
             })
             .when("/roles/edit/:subject", {
                 controller: 'EditRoleCtrl',
                 resolve: { roles: "idmRoles" },
-                templateUrl: PathBase + '/assets/Templates.roles.edit.html'
+                templateUrl: safeTemplateUrl(PathBase, '/assets/Templates.roles.edit.html')
             });
     }
     config.$inject = ["$routeProvider", "PathBase"];
     app.config(config);
 
     function ListRolesCtrl($scope, idmRoles, idmPager, $routeParams, $location) {
-        var model = {
+        const model = {
             message : null,
             roles : null,
             pager : null,
@@ -42,15 +51,15 @@
         $scope.model = model;
 
         $scope.search = function (filter) {
-            var url = "/roles/list";
+            let url = "/roles/list";
             if (filter) {
                 url += "/" + filter;
             }
             $location.url(url);
         };
 
-        var itemsPerPage = 10;
-        var startItem = (model.page - 1) * itemsPerPage;
+        const itemsPerPage = 10;
+        const startItem = (model.page - 1) * itemsPerPage;
 
         idmRoles.getRoles(model.filter, startItem, itemsPerPage).then(function (result) {
             $scope.model.waiting = false;
@@ -67,14 +76,14 @@
     app.controller("ListRolesCtrl", ListRolesCtrl);
 
     function NewRoleCtrl($scope, idmRoles, api, ttFeedback) {
-        var feedback = new ttFeedback();
+        const feedback = new ttFeedback();
         $scope.feedback = feedback;
         if (!api.links.createRole) {
             feedback.errors = "Create Not Supported";
             return;
         }
         else {
-            var properties = api.links.createRole.meta
+            const properties = api.links.createRole.meta
                 .map(function (item) {
                     return {
                         meta : item,
@@ -83,7 +92,7 @@
                 });
             $scope.properties = properties;
             $scope.create = function (properties) {
-                var props = properties.map(function (item) {
+                const props = properties.map(function (item) {
                     return {
                         type: item.meta.type,
                         value: item.data
@@ -101,7 +110,7 @@
     app.controller("NewRoleCtrl", NewRoleCtrl);
 
     function EditRoleCtrl($scope, idmRoles, $routeParams, ttFeedback) {
-        var feedback = new ttFeedback();
+        const feedback = new ttFeedback();
         $scope.feedback = feedback;
 
         function loadRole() {

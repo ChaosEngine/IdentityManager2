@@ -4,16 +4,25 @@
 
 (function (angular) {
     const app = angular.module("ttIdmApp", ["ngRoute", "ttIdm", "ttIdmUI", "ttIdmUsers", "ttIdmRoles"]);
+    function safeTemplateUrl(pathBase, templatePath) {
+        const base = typeof pathBase === "string" ? pathBase.trim().replace(/\/$/, "") : "";
+        if (typeof templatePath !== "string" || templatePath.charAt(0) !== "/") {
+            return `${base}/assets/Templates.message.html`;
+        }
+
+        return `${base}${templatePath}`;
+    }
+
     function config(PathBase, $routeProvider, $locationProvider) {
         // Configure hash prefix to empty string for compatibility with Angular 1.3.x URLs
         $locationProvider.hashPrefix('');
         
         $routeProvider
             .when("/", {
-                templateUrl: PathBase + "/assets/Templates.home.html"
+                templateUrl: safeTemplateUrl(PathBase, "/assets/Templates.home.html")
             })
             .when("/error", {
-                templateUrl: PathBase + "/assets/Templates.message.html"
+                templateUrl: safeTemplateUrl(PathBase, "/assets/Templates.message.html")
             })
             .otherwise({
                 redirectTo: "/"
@@ -23,6 +32,7 @@
     app.config(config);
 
     function LayoutCtrl($rootScope, PathBase, idmApi, $location, $window, idmErrorService, ShowLoginButton,
+        ttSafeDom,
         TitleNavBarLinkTarget, LoginPath, LogoutPath) {
         $rootScope.PathBase = PathBase;
         $rootScope.layout = {};
@@ -53,24 +63,20 @@
 
         load();
 
-        function isSafePath(path) {
-            // Must start with a single '/' to prevent open redirect via protocol-relative URLs or javascript: schemes
-            return typeof path === 'string' && path.length > 1 && path.charAt(0) === '/' && path.charAt(1) !== '/';
-        }
-
         $rootScope.login = function () {
             idmErrorService.clear();
-            const path = isSafePath(LoginPath) ? LoginPath : "/api/login";
-            $window.location = PathBase + path;
+            const safeUrl = ttSafeDom.safeNavigationUrl(PathBase, LoginPath, "/api/login");
+            $window.location = safeUrl;
         };
 
         $rootScope.logout = function() {
             idmErrorService.clear();
-            const path = isSafePath(LogoutPath) ? LogoutPath : "/api/logout";
-            $window.location = PathBase + path;
+            const safeUrl = ttSafeDom.safeNavigationUrl(PathBase, LogoutPath, "/api/logout");
+            $window.location = safeUrl;
         };
     }
     LayoutCtrl.$inject = ["$rootScope", "PathBase", "idmApi", "$location", "$window", "idmErrorService", "ShowLoginButton",
+        "ttSafeDom",
         "TitleNavBarLinkTarget", "LoginPath", "LogoutPath"];
     app.controller("LayoutCtrl", LayoutCtrl);
 })(angular);
