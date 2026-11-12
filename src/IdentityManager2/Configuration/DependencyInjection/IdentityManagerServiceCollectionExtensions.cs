@@ -23,7 +23,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 // options.HeaderName = "X-XSRF-TOKEN";
                 // options.Cookie.Name = "XSRF-TOKEN";
-                options.Cookie.HttpOnly = false;
+                options.Cookie.HttpOnly = true;
                 options.Cookie.SameSite = SameSiteMode.Strict;
             });
 
